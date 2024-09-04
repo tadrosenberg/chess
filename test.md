@@ -1,1 +1,1 @@
-Testing out auto-commit through intellij
+Changing the text here
