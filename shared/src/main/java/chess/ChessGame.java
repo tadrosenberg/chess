@@ -15,8 +15,8 @@ public class ChessGame {
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public String toString() {
+        return super.toString();
     }
 
     @Override
@@ -25,8 +25,8 @@ public class ChessGame {
     }
 
     @Override
-    public String toString() {
-        return super.toString();
+    public int hashCode() {
+        return super.hashCode();
     }
 
     /**

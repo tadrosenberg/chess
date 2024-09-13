@@ -80,6 +80,6 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
     }
 
     private boolean isWithinBounds(int row, int col) {
-        return row >= 0 && row < 8 && col >= 0 && col < 8; // Assuming an 8x8 chessboard
+        return row >= 1 && row < 9 && col >= 1 && col < 9; // Assuming an 8x8 chessboard
     }
 }

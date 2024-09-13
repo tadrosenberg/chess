@@ -25,13 +25,13 @@ public class ChessMove {
     }
 
     @Override
-    public String toString() {
-        return "(S" + startPosition + ", E" + endPosition + ", P-" + promotionPiece + ")";
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public String toString() {
+        return startPosition + ":" + endPosition + ":" + promotionPiece;
     }
 
     /**

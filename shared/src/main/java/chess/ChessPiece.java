@@ -11,8 +11,8 @@ import java.util.Collection;
  */
 public class ChessPiece {
     @Override
-    public String toString() {
-        return getPieceType().toString();
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override
@@ -21,8 +21,8 @@ public class ChessPiece {
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public String toString() {
+        return super.toString();
     }
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
