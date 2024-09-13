@@ -26,7 +26,7 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "(S" + startPosition + ", E" + endPosition + ", P-" + promotionPiece + ")";
     }
 
     @Override
