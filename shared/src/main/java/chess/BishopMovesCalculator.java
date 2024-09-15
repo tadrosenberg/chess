@@ -4,20 +4,7 @@ import java.util.Collection;
 import java.util.ArrayList;
 
 public class BishopMovesCalculator implements PieceMovesCalculator {
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
@@ -27,7 +14,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             if (board.getPiece(pos) == null) {
                 moves.add(new ChessMove(position, pos, null));
             } else if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                moves.add(new ChessMove(position, pos, board.getPiece(pos).getPieceType()));
+                moves.add(new ChessMove(position, pos, null));
             }
         }
         return moves;

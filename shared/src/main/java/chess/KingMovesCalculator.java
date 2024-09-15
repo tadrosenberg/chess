@@ -4,39 +4,61 @@ import java.util.Collection;
 import java.util.ArrayList;
 
 public class KingMovesCalculator implements PieceMovesCalculator {
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
         // Implement logic to calculate king's moves
-        for (ChessPosition pos : getKingMoves(position)) {
+        for (ChessPosition pos : getKingMoves(board, position)) {
             if (board.getPiece(pos) == null) {
                 moves.add(new ChessMove(position, pos, null));
             } else if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                moves.add(new ChessMove(position, pos, board.getPiece(pos).getPieceType()));
+                moves.add(new ChessMove(position, pos, null));
             }
         }
         return moves;
     }
 
-    // Helper method to get potential moves for the king
-    private Collection<ChessPosition> getKingMoves(ChessPosition position) {
+    private Collection<ChessPosition> getKingMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessPosition> kingMoves = new ArrayList<>();
+        int currentRow = myPosition.getRow();
+        int currentCol = myPosition.getColumn();
+        int[][] directions = {
+                {1, 0},
+                {0, 1},
+                {-1, 0},
+                {0, -1},
+                {1, 1},
+                {1, -1},
+                {-1, 1},
+                {-1, -1}
+        };
+
+        for (int[] direction : directions) {
+            int newRow = currentRow + direction[0];
+            int newCol = currentCol + direction[1];
+
+            // Check if the new position is within bounds
+            if (isWithinBounds(newRow, newCol)) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+
+                // Check if the new position is blocked
+                ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
+                if (pieceAtNewPosition == null) {
+                    // If no piece is at the new position, it's a valid move
+                    kingMoves.add(newPosition);
+                } else if (pieceAtNewPosition.getTeamColor() != board.getPiece(myPosition).getTeamColor()) {
+                    // If the piece is of the opposite color, it's a valid capture move
+                    kingMoves.add(newPosition);
+                }
+                // No need for a break since the King only moves one square
+            }
+        }
 
         return kingMoves;
+    }
+
+    private boolean isWithinBounds(int row, int col) {
+        return row >= 1 && row < 9 && col >= 1 && col < 9; // Assuming an 8x8 chessboard
     }
 }
