@@ -3,6 +3,9 @@ package chess;
 import java.util.Collection;
 import java.util.ArrayList;
 
+import static chess.ChessPiece.PieceType.*;
+import static chess.ChessGame.TeamColor.*;
+
 public class PawnMovesCalculator implements PieceMovesCalculator {
 
     @Override
@@ -11,25 +14,25 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         // Implement logic to calculate pawn's moves
         for (ChessPosition pos : getPawnMoves(board, position)) {
 
-            boolean isPromotionMove = (board.getPiece(position).getTeamColor() == ChessGame.TeamColor.WHITE && pos.getRow() == 8) ||
-                    (board.getPiece(position).getTeamColor() == ChessGame.TeamColor.BLACK && pos.getRow() == 1);
+            boolean isPromotionMove = (board.getPiece(position).getTeamColor() == WHITE && pos.getRow() == 8) ||
+                    (board.getPiece(position).getTeamColor() == BLACK && pos.getRow() == 1);
 
             if (board.getPiece(pos) == null) {
                 if (isPromotionMove) {
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.QUEEN));
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.ROOK));
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.KNIGHT));
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.BISHOP));
+                    moves.add(new ChessMove(position, pos, QUEEN));
+                    moves.add(new ChessMove(position, pos, ROOK));
+                    moves.add(new ChessMove(position, pos, KNIGHT));
+                    moves.add(new ChessMove(position, pos, BISHOP));
 
                 } else {
                     moves.add(new ChessMove(position, pos, null));
                 }
             } else if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
                 if (isPromotionMove) {
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.QUEEN));
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.ROOK));
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.KNIGHT));
-                    moves.add(new ChessMove(position, pos, ChessPiece.PieceType.BISHOP));
+                    moves.add(new ChessMove(position, pos, QUEEN));
+                    moves.add(new ChessMove(position, pos, ROOK));
+                    moves.add(new ChessMove(position, pos, KNIGHT));
+                    moves.add(new ChessMove(position, pos, BISHOP));
                 } else {
                     moves.add(new ChessMove(position, pos, null));
                 }
