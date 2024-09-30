@@ -68,6 +68,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece pieceToMove = gameBoard.getPiece(move.getStartPosition());
+        ChessPiece tempPiece = gameBoard.getPiece(move.getEndPosition());
         if (pieceToMove == null) {
             throw new InvalidMoveException("No piece there");
         }
@@ -86,7 +87,7 @@ public class ChessGame {
             gameBoard.addPiece(move.getStartPosition(), null);
             gameBoard.addPiece(move.getEndPosition(), pieceToMove);
             if (isInCheck(pieceToMove.getTeamColor())) {
-                gameBoard.addPiece(move.getEndPosition(), null);
+                gameBoard.addPiece(move.getEndPosition(), tempPiece);
                 gameBoard.addPiece(move.getStartPosition(), pieceToMove);
                 throw new InvalidMoveException();
             }
@@ -148,17 +149,20 @@ public class ChessGame {
                 for (int col = 1; col < 9; col++) {
                     ChessPosition currentPosition = new ChessPosition(row, col);
                     ChessPiece currentPiece = gameBoard.getPiece(currentPosition);
-                    Collection<ChessMove> moves = validMoves(currentPosition);
-                    for (ChessMove move : moves) {
-                        gameBoard.addPiece(move.getStartPosition(), null);
-                        gameBoard.addPiece(move.getEndPosition(), currentPiece);
-                        if (isInCheck(currentPiece.getTeamColor())) {
-                            gameBoard.addPiece(move.getEndPosition(), null);
-                            gameBoard.addPiece(move.getStartPosition(), currentPiece);
-                        } else {
-                            gameBoard.addPiece(move.getEndPosition(), null);
-                            gameBoard.addPiece(move.getStartPosition(), currentPiece);
-                            return false;
+                    if (currentPiece != null && currentPiece.getTeamColor() == teamColor) {
+                        Collection<ChessMove> moves = validMoves(currentPosition);
+                        for (ChessMove move : moves) {
+                            ChessPiece tempPiece = gameBoard.getPiece(move.getEndPosition());
+                            gameBoard.addPiece(move.getStartPosition(), null);
+                            gameBoard.addPiece(move.getEndPosition(), currentPiece);
+                            if (isInCheck(currentPiece.getTeamColor())) {
+                                gameBoard.addPiece(move.getEndPosition(), tempPiece);
+                                gameBoard.addPiece(move.getStartPosition(), currentPiece);
+                            } else {
+                                gameBoard.addPiece(move.getEndPosition(), tempPiece);
+                                gameBoard.addPiece(move.getStartPosition(), currentPiece);
+                                return false;
+                            }
                         }
                     }
                 }
