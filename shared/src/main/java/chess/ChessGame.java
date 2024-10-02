@@ -61,7 +61,21 @@ public class ChessGame {
         }
 
         Iterator<ChessMove> iterator = moves.iterator();
-        
+        while (iterator.hasNext()) {
+            ChessMove move = iterator.next();
+            ChessPiece tempPiece = gameBoard.getPiece(move.getEndPosition());
+
+            gameBoard.addPiece(move.getStartPosition(), null);
+            gameBoard.addPiece(move.getEndPosition(), currentPiece);
+
+            assert currentPiece != null;
+            if (isInCheck(currentPiece.getTeamColor())) {
+                iterator.remove();
+            }
+
+            gameBoard.addPiece(move.getEndPosition(), tempPiece);
+            gameBoard.addPiece(move.getStartPosition(), currentPiece);
+        }
 
         return moves;
     }
