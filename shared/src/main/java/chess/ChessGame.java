@@ -145,19 +145,7 @@ public class ChessGame {
         }
         return false;
     }
-
-    public ChessPosition findKingPosition(TeamColor teamColor) {
-        for (int row = 1; row < 9; row++) {
-            for (int col = 1; col < 9; col++) {
-                ChessPosition currentPosition = new ChessPosition(row, col);
-                ChessPiece currentPiece = gameBoard.getPiece(currentPosition);
-                if (currentPiece != null && currentPiece.getPieceType().equals(ChessPiece.PieceType.KING) && currentPiece.getTeamColor().equals(teamColor)) {
-                    return currentPosition;
-                }
-            }
-        }
-        return null;
-    }
+    
 
     /**
      * Determines if the given team is in checkmate
