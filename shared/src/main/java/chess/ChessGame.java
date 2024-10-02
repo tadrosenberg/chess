@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -52,12 +53,31 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
-        if (gameBoard.getPiece(startPosition) != null) {
-            validMoves = gameBoard.getPiece(startPosition).pieceMoves(gameBoard, startPosition);
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessPiece currentPiece = gameBoard.getPiece(startPosition);
+        if (currentPiece != null) {
+            moves = currentPiece.pieceMoves(gameBoard, startPosition);
         }
 
-        return validMoves;
+        Iterator<ChessMove> iterator = moves.iterator();
+        while (iterator.hasNext()) {
+            ChessMove move = iterator.next();
+            ChessPiece tempPiece = gameBoard.getPiece(move.getEndPosition());
+
+            gameBoard.addPiece(move.getStartPosition(), null);
+            gameBoard.addPiece(move.getEndPosition(), currentPiece);
+
+            assert currentPiece != null;
+            if (isInCheck(currentPiece.getTeamColor())) {
+                iterator.remove();
+            }
+
+            gameBoard.addPiece(move.getEndPosition(), tempPiece);
+            gameBoard.addPiece(move.getStartPosition(), currentPiece);
+        }
+
+        return moves;
     }
 
     /**
@@ -180,7 +200,23 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+        
+        for (int row = 1; row < 9; row++) {
+            for (int col = 1; col < 9; col++) {
+                ChessPosition currentPosition = new ChessPosition(row, col);
+                ChessPiece currentPiece = gameBoard.getPiece(currentPosition);
+                if (currentPiece != null && currentPiece.getTeamColor().equals(teamColor)) {
+                    Collection<ChessMove> moves = validMoves(currentPosition);
+                    if (!moves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
