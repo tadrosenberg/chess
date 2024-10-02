@@ -127,7 +127,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingsLocation = findKingPosition(teamColor);
-        
+
         for (int row = 1; row < 9; row++) {
             for (int col = 1; col < 9; col++) {
                 ChessPosition currentPosition = new ChessPosition(row, col);
@@ -217,6 +217,7 @@ public class ChessGame {
                 }
             }
         }
+
         return true;
     }
 
