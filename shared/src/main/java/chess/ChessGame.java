@@ -228,6 +228,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+        this.gameBoard = board;
     }
 
     /**
@@ -236,5 +237,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
+        return gameBoard;
     }
 }
