@@ -5,10 +5,8 @@ import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryGameDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.ClearService;
 import model.UserData;
 import model.AuthData;
-import model.GameData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,12 +26,16 @@ class ClearServiceTest {
     void clearAllData() throws Exception {
         // Pre-populate DAOs with dummy data
         userDAO.createUser(new UserData("user1", "password", "email@example.com"));
-        authDAO.createAuth(new AuthData("token1", "user1"));
+
+        // Capture the dynamically generated authToken when creating AuthData
+        AuthData authData = authDAO.createAuth("user1");
+        String generatedAuthToken = authData.authToken();
+
         gameDAO.createGame("Test Game");
 
         // Assert that data exists before clearing
         assertNotNull(userDAO.getUser("user1"));
-        assertNotNull(authDAO.getAuth("token1"));
+        assertNotNull(authDAO.getAuth(generatedAuthToken));
         assertEquals(1, gameDAO.listGames().length);
 
         // Clear all data
@@ -41,7 +43,7 @@ class ClearServiceTest {
 
         // Assert that all data has been cleared
         assertThrows(Exception.class, () -> userDAO.getUser("user1"));
-        assertThrows(Exception.class, () -> authDAO.getAuth("token1"));
+        assertThrows(Exception.class, () -> authDAO.getAuth(generatedAuthToken));
         assertEquals(0, gameDAO.listGames().length);
     }
 
@@ -52,7 +54,7 @@ class ClearServiceTest {
 
         // Ensure all data remains empty without throwing exceptions
         assertThrows(Exception.class, () -> userDAO.getUser("user1"));
-        assertThrows(Exception.class, () -> authDAO.getAuth("token1"));
+        assertThrows(Exception.class, () -> authDAO.getAuth("token1")); // token1 should not exist
         assertEquals(0, gameDAO.listGames().length);
     }
 }
