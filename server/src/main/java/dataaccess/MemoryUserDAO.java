@@ -13,7 +13,7 @@ public class MemoryUserDAO implements UserDAO {
     public UserData createUser(UserData user) throws ServiceException {
         // Check if the username already exists
         if (users.containsKey(user.username())) {
-            throw new ServiceException(403, "Username already exists");
+            throw new ServiceException(403, "Error: already taken");
         }
 
         // Add the user to the map
