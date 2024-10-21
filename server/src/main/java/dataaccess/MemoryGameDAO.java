@@ -13,13 +13,10 @@ public class MemoryGameDAO implements GameDAO {
     public GameData createGame(String gameName) throws DataAccessException {
         int gameId = nextGameId++;
 
-        // Create a new GameData object
         GameData newGame = new GameData(gameId, null, null, gameName, null);
 
-        // Store the new game in the map
         games.put(gameId, newGame);
 
-        // Return the game ID
         return games.get(gameId);
     }
 
