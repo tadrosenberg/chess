@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
+import result.LoginResult;
 
 public class UserService {
 
@@ -30,20 +31,22 @@ public class UserService {
     }
 
     // Log in an existing user and return a new auth token
-    public AuthData login(UserData user) throws DataAccessException {
+    public LoginResult login(UserData user) throws ServiceException, DataAccessException {
         // Check if the user exists in the database
         UserData existingUser = userDAO.getUser(user.username());
         if (existingUser == null) {
-            throw new DataAccessException("User not found.");
+            throw new ServiceException(401, "Error: unauthorized");
         }
 
         // Verify the password (you might want to add password hashing here)
         if (!existingUser.password().equals(user.password())) {
-            throw new DataAccessException("Incorrect password.");
+            throw new ServiceException(401, "Error: unauthorized");
         }
 
+        AuthData existingAuthData = authDAO.createAuth(user.username());
+
         // Generate a new auth token for the logged-in user
-        return authDAO.createAuth(user.username());
+        return new LoginResult(user.username(), existingAuthData.authToken());
     }
 
     // Log out a user by invalidating their auth token

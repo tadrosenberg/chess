@@ -23,10 +23,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
-        if (!users.containsKey(username)) {
-            throw new DataAccessException("User not found.");
-        }
+    public UserData getUser(String username) {
         return users.get(username);
     }
 

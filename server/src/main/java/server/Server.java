@@ -29,6 +29,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::register);
         Spark.delete("/db", this::clear);
+        Spark.post("/session", this::login);
         Spark.exception(Exception.class, this::exceptionHandler);
 
 
@@ -47,6 +48,12 @@ public class Server {
     private String register(Request req, Response res) throws Exception {
         var newUser = serializer.fromJson(req.body(), UserData.class);
         var result = userService.register(newUser);
+        return serializer.toJson(result);
+    }
+
+    private String login(Request req, Response res) throws Exception {
+        var loginRequest = serializer.fromJson(req.body(), UserData.class);
+        var result = userService.login(loginRequest);
         return serializer.toJson(result);
     }
 
