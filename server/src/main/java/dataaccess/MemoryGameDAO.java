@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.GameData;
+import service.ServiceException;
 
 import java.util.HashMap;
 import java.util.Map;

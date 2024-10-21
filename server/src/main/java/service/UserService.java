@@ -17,13 +17,12 @@ public class UserService {
     }
 
     // Register a new user and return their auth token
-    public AuthData register(UserData user) throws DataAccessException {
-        // Check if the username is already taken
-        if (userDAO.getUser(user.username()) != null) {
-            throw new DataAccessException("Username already taken.");
+    public AuthData register(UserData user) throws ServiceException {
+        if (user.username() == null || user.username().isEmpty() ||
+                user.password() == null || user.password().isEmpty() ||
+                user.email() == null || user.email().isEmpty()) {
+            throw new ServiceException(400, "Error: Bad request");
         }
-
-        // Store the new user in the database
         userDAO.createUser(user);
 
         // Generate an auth token for the new user
