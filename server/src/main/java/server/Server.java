@@ -15,12 +15,12 @@ import java.util.Map;
 
 public class Server {
 
-    private final MemoryUserDAO userDAO = new MemoryUserDAO();
-    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private final MemoryGameDAO gameDAO = new MemoryGameDAO();
-    private final UserService userService = new UserService(userDAO, authDAO);
-    private final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-    private final GameService gameService = new GameService(authDAO, gameDAO);
+    private MemoryUserDAO userDAO = new MemoryUserDAO();
+    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private MemoryGameDAO gameDAO = new MemoryGameDAO();
+    private UserService userService = new UserService(userDAO, authDAO);
+    private ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+    private GameService gameService = new GameService(authDAO, gameDAO);
 
     private final Gson serializer = new Gson();
 
