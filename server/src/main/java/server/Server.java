@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.UserData;
 import org.eclipse.jetty.server.Authentication;
+import request.CreateGameRequest;
 import request.LogoutRequest;
 import service.ClearService;
+import service.GameService;
 import service.ServiceException;
 import service.UserService;
 import spark.*;
@@ -19,6 +21,7 @@ public class Server {
     private final MemoryGameDAO gameDAO = new MemoryGameDAO();
     private final UserService userService = new UserService(userDAO, authDAO);
     private final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+    private final GameService gameService = new GameService(userDAO, authDAO, gameDAO);
 
     private final Gson serializer = new Gson();
 
@@ -32,6 +35,8 @@ public class Server {
         Spark.delete("/db", this::clear);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.post("/game", this::createGame);
+        Spark.get("/game", this::listGames);
         Spark.exception(Exception.class, this::exceptionHandler);
 
 
@@ -64,6 +69,13 @@ public class Server {
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
         userService.logout(logoutRequest);
         return "";
+    }
+
+    private String createGame(Request req, Response res) throws Exception {
+        String authToken = req.headers("authorization");
+        var createGameRequest = serializer.fromJson(req.body(), CreateGameRequest.class);
+        var result = gameService.createGame(createGameRequest.gameName(), authToken);
+        return serializer.toJson(result);
     }
 
     private String clear(Request req, Response res) throws Exception {

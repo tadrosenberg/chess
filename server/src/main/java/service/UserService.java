@@ -58,9 +58,4 @@ public class UserService {
         }
         authDAO.deleteAuth(auth.authToken());
     }
-
-    // Optional: Helper function to check if a username is available
-    public boolean isUsernameAvailable(String username) throws DataAccessException {
-        return userDAO.getUser(username) == null;
-    }
 }
