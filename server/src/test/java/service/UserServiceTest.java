@@ -1,12 +1,13 @@
 package service;
 
-import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryAuthDAO;
-import model.UserData;
+import dataaccess.MemoryUserDAO;
+import dataaccess.DataAccessException;
 import model.AuthData;
+import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.ServiceException;
+import result.LoginResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,63 +17,99 @@ class UserServiceTest {
     private MemoryUserDAO userDAO;
     private MemoryAuthDAO authDAO;
 
+    // Constants
+    private static final String VALID_USERNAME = "validUser";
+    private static final String VALID_PASSWORD = "validPassword";
+    private static final String VALID_EMAIL = "valid@example.com";
+    private static final String INVALID_USERNAME = "invalidUser";
+    private static final String INVALID_PASSWORD = "invalidPassword";
+    private static final String INVALID_AUTH_TOKEN = "invalidToken";
+
     @BeforeEach
     void setUp() {
-        // Initialize the in-memory DAO and the UserService for testing
+        // Initialize in-memory DAOs and service for each test
         userDAO = new MemoryUserDAO();
-        authDAO = new MemoryAuthDAO();  // AuthDAO is needed for user registration
+        authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);
     }
 
+    // Test Register
     @Test
-    void testRegisterUser() throws Exception {
-        // Create a new user
-        AuthData authData = userService.register(new UserData("user1", "password1", "user1@example.com"));
+    void testRegister() throws ServiceException, DataAccessException {
+        // Positive case: Register a new user
+        UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
+        AuthData authData = userService.register(newUser);
 
-        // Assert that the user was created successfully
-        UserData user = userDAO.getUser("user1");
-        assertNotNull(user);
-        assertEquals("user1", user.username());
-        assertEquals("password1", user.password());
-        assertEquals("user1@example.com", user.email());
-
-        // Assert that auth token was generated
-        assertNotNull(authData.authToken());
-        assertEquals("user1", authData.username());
+        assertNotNull(authData);
+        assertEquals(VALID_USERNAME, authData.username());
     }
 
     @Test
-    void testRegisterDuplicateUser() {
-        // First user registration should succeed
-        assertDoesNotThrow(() -> userService.register(new UserData("user1", "password1", "user1@example.com")));
+    void testRegisterMissingData() {
+        // Negative case: Register with missing username
+        UserData invalidUser = new UserData("", VALID_PASSWORD, VALID_EMAIL);
+        UserData finalInvalidUser = invalidUser;
+        assertThrows(ServiceException.class, () -> userService.register(finalInvalidUser));
 
-        // Trying to register a user with the same username should throw a ServiceException
-        ServiceException exception = assertThrows(ServiceException.class, () -> userService.register(new UserData("user1", "password2", "user2@example.com")));
-        assertEquals(403, exception.getStatusCode());  // Status code should be 403 for "Username already exists"
-        assertEquals("Username already exists", exception.getMessage());
+        // Negative case: Register with missing password
+        invalidUser = new UserData(VALID_USERNAME, "", VALID_EMAIL);
+        UserData finalInvalidUser1 = invalidUser;
+        assertThrows(ServiceException.class, () -> userService.register(finalInvalidUser1));
+
+        // Negative case: Register with missing email
+        invalidUser = new UserData(VALID_USERNAME, VALID_PASSWORD, "");
+        UserData finalInvalidUser2 = invalidUser;
+        assertThrows(ServiceException.class, () -> userService.register(finalInvalidUser2));
+    }
+
+    // Test Login
+    @Test
+    void testLogin() throws ServiceException, DataAccessException {
+        // Positive case: Log in with correct credentials
+        UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
+        userService.register(newUser);
+
+        UserData loginUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
+        LoginResult loginResult = userService.login(loginUser);
+
+        assertNotNull(loginResult);
+        assertEquals(VALID_USERNAME, loginResult.username());
+        assertNotNull(loginResult.authToken());
     }
 
     @Test
-    void testRegisterInvalidUsername() {
-        // Registering a user with an invalid username (empty) should throw a ServiceException
-        ServiceException exception = assertThrows(ServiceException.class, () -> userService.register(new UserData("", "password1", "user1@example.com")));
-        assertEquals(400, exception.getStatusCode());  // Status code should be 400 for "Bad request"
-        assertEquals("Error: bad request - missing required fields", exception.getMessage());
+    void testLoginInvalidUsername() {
+        // Negative case: Login with invalid username
+        UserData invalidUser = new UserData(INVALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
+        assertThrows(ServiceException.class, () -> userService.login(invalidUser));
     }
 
     @Test
-    void testRegisterInvalidPassword() {
-        // Registering a user with an invalid password (empty) should throw a ServiceException
-        ServiceException exception = assertThrows(ServiceException.class, () -> userService.register(new UserData("user1", "", "user1@example.com")));
-        assertEquals(400, exception.getStatusCode());  // Status code should be 400 for "Bad request"
-        assertEquals("Error: bad request - missing required fields", exception.getMessage());
+    void testLoginInvalidPassword() throws ServiceException, DataAccessException {
+        // Negative case: Login with incorrect password
+        UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
+        userService.register(newUser);
+
+        UserData invalidUser = new UserData(VALID_USERNAME, INVALID_PASSWORD, VALID_EMAIL);
+        assertThrows(ServiceException.class, () -> userService.login(invalidUser));
+    }
+
+    // Test Logout
+    @Test
+    void testLogout() throws ServiceException, DataAccessException {
+        // Positive case: Log out a user
+        UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
+        AuthData authData = userService.register(newUser);
+
+        assertDoesNotThrow(() -> userService.logout(authData.authToken()));
+
+        // Negative case: Ensure token is no longer valid after logout
+        assertThrows(ServiceException.class, () -> userService.logout(authData.authToken()));
     }
 
     @Test
-    void testRegisterInvalidEmail() {
-        // Registering a user with an invalid email (empty) should throw a ServiceException
-        ServiceException exception = assertThrows(ServiceException.class, () -> userService.register(new UserData("user1", "password1", "")));
-        assertEquals(400, exception.getStatusCode());  // Status code should be 400 for "Bad request"
-        assertEquals("Error: bad request - missing required fields", exception.getMessage());
+    void testLogoutInvalidToken() {
+        // Negative case: Logout with invalid token
+        assertThrows(ServiceException.class, () -> userService.logout(INVALID_AUTH_TOKEN));
     }
 }

@@ -9,12 +9,12 @@ import result.LoginResult;
 
 public class UserService {
 
-    private final UserDAO USER_DAO;
-    private final AuthDAO AUTH_DAO;
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
 
     public UserService(UserDAO userDAO, AuthDAO authDAO) {
-        this.USER_DAO = userDAO;
-        this.AUTH_DAO = authDAO;
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
     }
 
     // Register a new user and return their auth token
@@ -24,16 +24,16 @@ public class UserService {
                 user.email() == null || user.email().isEmpty()) {
             throw new ServiceException(400, "Error: Bad request");
         }
-        USER_DAO.createUser(user);
+        userDAO.createUser(user);
 
         // Generate an auth token for the new user
-        return AUTH_DAO.createAuth(user.username());
+        return authDAO.createAuth(user.username());
     }
 
     // Log in an existing user and return a new auth token
     public LoginResult login(UserData user) throws ServiceException, DataAccessException {
         // Check if the user exists in the database
-        UserData existingUser = USER_DAO.getUser(user.username());
+        UserData existingUser = userDAO.getUser(user.username());
         if (existingUser == null) {
             throw new ServiceException(401, "Error: unauthorized");
         }
@@ -43,7 +43,7 @@ public class UserService {
             throw new ServiceException(401, "Error: unauthorized");
         }
 
-        AuthData existingAuthData = AUTH_DAO.createAuth(user.username());
+        AuthData existingAuthData = authDAO.createAuth(user.username());
 
         // Generate a new auth token for the logged-in user
         return new LoginResult(user.username(), existingAuthData.authToken());
@@ -52,9 +52,9 @@ public class UserService {
     // Log out a user by invalidating their auth token
     public void logout(String authToken) throws ServiceException, DataAccessException {
         // Invalidate the user's auth token by deleting it
-        if (AUTH_DAO.getAuth(authToken) == null) {
+        if (authDAO.getAuth(authToken) == null) {
             throw new ServiceException(401, "Error: unauthorized");
         }
-        AUTH_DAO.deleteAuth(authToken);
+        authDAO.deleteAuth(authToken);
     }
 }
