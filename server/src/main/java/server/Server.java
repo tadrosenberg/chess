@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.UserData;
 import org.eclipse.jetty.server.Authentication;
+import request.LogoutRequest;
 import service.ClearService;
 import service.ServiceException;
 import service.UserService;
@@ -30,6 +31,7 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.delete("/db", this::clear);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
         Spark.exception(Exception.class, this::exceptionHandler);
 
 
@@ -55,6 +57,13 @@ public class Server {
         var loginRequest = serializer.fromJson(req.body(), UserData.class);
         var result = userService.login(loginRequest);
         return serializer.toJson(result);
+    }
+
+    private String logout(Request req, Response res) throws Exception {
+        String authToken = req.headers("authorization");
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
+        userService.logout(logoutRequest);
+        return "";
     }
 
     private String clear(Request req, Response res) throws Exception {
