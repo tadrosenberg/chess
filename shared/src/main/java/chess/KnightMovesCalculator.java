@@ -8,14 +8,11 @@ public class KnightMovesCalculator implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
-        // Implement logic to calculate knight's moves
-        for (ChessPosition pos : getKnightMoves(board, position)) {
-            if (board.getPiece(pos) == null) {
-                moves.add(new ChessMove(position, pos, null));
-            } else if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                moves.add(new ChessMove(position, pos, null));
-            }
-        }
+        Collection<ChessPosition> possiblePositions = getKnightMoves(board, position);
+
+        // Use the utility function to add valid moves
+        MoveUtils.addValidMoves(moves, board, position, possiblePositions);
+
         return moves;
     }
 

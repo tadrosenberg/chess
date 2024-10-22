@@ -8,14 +8,8 @@ public class KingMovesCalculator implements PieceMovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
-        // Implement logic to calculate king's moves
-        for (ChessPosition pos : getKingMoves(board, position)) {
-            if (board.getPiece(pos) == null) {
-                moves.add(new ChessMove(position, pos, null));
-            } else if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                moves.add(new ChessMove(position, pos, null));
-            }
-        }
+        Collection<ChessPosition> possiblePositions = getKingMoves(board, position);
+        MoveUtils.addValidMoves(moves, board, position, possiblePositions);
         return moves;
     }
 
