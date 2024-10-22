@@ -150,8 +150,10 @@ public class ChessGame {
             for (int col = 1; col < 9; col++) {
                 ChessPosition currentPosition = new ChessPosition(row, col);
                 ChessPiece currentPiece = gameBoard.getPiece(currentPosition);
-                if (currentPiece != null && currentPiece.getPieceType().equals(ChessPiece.PieceType.KING) && currentPiece.getTeamColor().equals(teamColor)) {
-                    return currentPosition;
+                if (currentPiece != null && currentPiece.getPieceType().equals(ChessPiece.PieceType.KING)) {
+                    if (currentPiece.getTeamColor().equals(teamColor)) {
+                        return currentPosition;
+                    }
                 }
             }
         }
