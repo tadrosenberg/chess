@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
-import request.LogoutRequest;
 import result.LoginResult;
 
 public class UserService {
@@ -51,11 +50,11 @@ public class UserService {
     }
 
     // Log out a user by invalidating their auth token
-    public void logout(LogoutRequest auth) throws ServiceException, DataAccessException {
+    public void logout(String authToken) throws ServiceException, DataAccessException {
         // Invalidate the user's auth token by deleting it
-        if (authDAO.getAuth(auth.authToken()) == null) {
+        if (authDAO.getAuth(authToken) == null) {
             throw new ServiceException(401, "Error: unauthorized");
         }
-        authDAO.deleteAuth(auth.authToken());
+        authDAO.deleteAuth(authToken);
     }
 }

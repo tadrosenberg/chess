@@ -7,6 +7,7 @@ import dataaccess.UserDAO;
 import model.GameData;
 import request.CreateGameRequest;
 import result.CreateGameResult;
+import result.ListGamesResult;
 
 public class GameService {
     private final UserDAO userDAO;
@@ -29,5 +30,13 @@ public class GameService {
         GameData newGame = gameDAO.createGame(gameName);
 
         return new CreateGameResult(newGame.gameId());
+    }
+
+    public ListGamesResult listGames(String authToken) throws ServiceException, DataAccessException {
+        if (authDAO.getAuth(authToken) == null) {
+            throw new ServiceException(401, "Error: unauthorized");
+        }
+
+        return new ListGamesResult(gameDAO.listGames());
     }
 }

@@ -3,9 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import request.CreateGameRequest;
-import request.LogoutRequest;
 import service.ClearService;
 import service.GameService;
 import service.ServiceException;
@@ -66,8 +64,7 @@ public class Server {
 
     private String logout(Request req, Response res) throws Exception {
         String authToken = req.headers("authorization");
-        LogoutRequest logoutRequest = new LogoutRequest(authToken);
-        userService.logout(logoutRequest);
+        userService.logout(authToken);
         return "";
     }
 
@@ -75,6 +72,12 @@ public class Server {
         String authToken = req.headers("authorization");
         var createGameRequest = serializer.fromJson(req.body(), CreateGameRequest.class);
         var result = gameService.createGame(createGameRequest.gameName(), authToken);
+        return serializer.toJson(result);
+    }
+
+    private String listGames(Request req, Response res) throws Exception {
+        String authToken = req.headers("authorization");
+        var result = gameService.listGames(authToken);
         return serializer.toJson(result);
     }
 
