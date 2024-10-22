@@ -18,27 +18,23 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                     (board.getPiece(position).getTeamColor() == BLACK && pos.getRow() == 1);
 
             if (board.getPiece(pos) == null) {
-                if (isPromotionMove) {
-                    moves.add(new ChessMove(position, pos, QUEEN));
-                    moves.add(new ChessMove(position, pos, ROOK));
-                    moves.add(new ChessMove(position, pos, KNIGHT));
-                    moves.add(new ChessMove(position, pos, BISHOP));
-
-                } else {
-                    moves.add(new ChessMove(position, pos, null));
-                }
+                doPromotionMove(position, moves, pos, isPromotionMove);
             } else if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                if (isPromotionMove) {
-                    moves.add(new ChessMove(position, pos, QUEEN));
-                    moves.add(new ChessMove(position, pos, ROOK));
-                    moves.add(new ChessMove(position, pos, KNIGHT));
-                    moves.add(new ChessMove(position, pos, BISHOP));
-                } else {
-                    moves.add(new ChessMove(position, pos, null));
-                }
+                doPromotionMove(position, moves, pos, isPromotionMove);
             }
         }
         return moves;
+    }
+
+    private void doPromotionMove(ChessPosition position, Collection<ChessMove> moves, ChessPosition pos, boolean isPromotionMove) {
+        if (isPromotionMove) {
+            moves.add(new ChessMove(position, pos, QUEEN));
+            moves.add(new ChessMove(position, pos, ROOK));
+            moves.add(new ChessMove(position, pos, KNIGHT));
+            moves.add(new ChessMove(position, pos, BISHOP));
+        } else {
+            moves.add(new ChessMove(position, pos, null));
+        }
     }
 
     private Collection<ChessPosition> getPawnMoves(ChessBoard board, ChessPosition myPosition) {
