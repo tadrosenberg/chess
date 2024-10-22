@@ -3,19 +3,19 @@ package service;
 import dataaccess.*;
 
 public class ClearService {
-    private MemoryUserDAO userDAO;
-    private MemoryAuthDAO authDAO;
-    private MemoryGameDAO gameDAO;
+    private final MemoryUserDAO USER_DAO;
+    private final MemoryAuthDAO AUTH_DAO;
+    private final MemoryGameDAO GAME_DAO;
 
     public ClearService(MemoryUserDAO userDAO, MemoryAuthDAO authDAO, MemoryGameDAO gameDAO) {
-        this.userDAO = userDAO;
-        this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
+        this.USER_DAO = userDAO;
+        this.AUTH_DAO = authDAO;
+        this.GAME_DAO = gameDAO;
     }
 
     public void clear() throws DataAccessException {
-        userDAO.clearUserData();
-        authDAO.clearAuthData();
-        gameDAO.clearGameData();
+        USER_DAO.clearUserData();
+        AUTH_DAO.clearAuthData();
+        GAME_DAO.clearGameData();
     }
 }

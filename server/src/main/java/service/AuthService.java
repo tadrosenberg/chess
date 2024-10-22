@@ -5,21 +5,21 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 
 public class AuthService {
-    private final AuthDAO authDAO;
+    private final AuthDAO AUTH_DAO;
 
     public AuthService(AuthDAO authDAO) {
-        this.authDAO = authDAO;
+        this.AUTH_DAO = authDAO;
     }
 
     public AuthData createAuth(String username) throws DataAccessException {
-        return authDAO.createAuth(username);
+        return AUTH_DAO.createAuth(username);
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return authDAO.getAuth(authToken);
+        return AUTH_DAO.getAuth(authToken);
     }
 
     public void deleteAuth(String authToken) throws DataAccessException {
-        authDAO.deleteAuth(authToken);
+        AUTH_DAO.deleteAuth(authToken);
     }
 }

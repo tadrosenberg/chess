@@ -15,12 +15,12 @@ import java.util.Map;
 
 public class Server {
 
-    private MemoryUserDAO userDAO = new MemoryUserDAO();
-    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private MemoryGameDAO gameDAO = new MemoryGameDAO();
-    private UserService userService = new UserService(userDAO, authDAO);
-    private ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-    private GameService gameService = new GameService(authDAO, gameDAO);
+    private final MemoryUserDAO USER_DAO = new MemoryUserDAO();
+    private final MemoryAuthDAO AUTH_DAO = new MemoryAuthDAO();
+    private final MemoryGameDAO GAME_DAO = new MemoryGameDAO();
+    private final UserService USER_SERVICE = new UserService(USER_DAO, AUTH_DAO);
+    private final ClearService CLEAR_SERVICE = new ClearService(USER_DAO, AUTH_DAO, GAME_DAO);
+    private final GameService GAME_SERVICE = new GameService(AUTH_DAO, GAME_DAO);
 
     private final Gson serializer = new Gson();
 
@@ -54,45 +54,45 @@ public class Server {
 
     private String register(Request req, Response res) throws Exception {
         var newUser = serializer.fromJson(req.body(), UserData.class);
-        var result = userService.register(newUser);
+        var result = USER_SERVICE.register(newUser);
         return serializer.toJson(result);
     }
 
     private String login(Request req, Response res) throws Exception {
         var loginRequest = serializer.fromJson(req.body(), UserData.class);
-        var result = userService.login(loginRequest);
+        var result = USER_SERVICE.login(loginRequest);
         return serializer.toJson(result);
     }
 
     private String logout(Request req, Response res) throws Exception {
         String authToken = req.headers("authorization");
-        userService.logout(authToken);
+        USER_SERVICE.logout(authToken);
         return "";
     }
 
     private String createGame(Request req, Response res) throws Exception {
         String authToken = req.headers("authorization");
         var createGameRequest = serializer.fromJson(req.body(), CreateGameRequest.class);
-        var result = gameService.createGame(createGameRequest.gameName(), authToken);
+        var result = GAME_SERVICE.createGame(createGameRequest.gameName(), authToken);
         return serializer.toJson(result);
     }
 
     private String listGames(Request req, Response res) throws Exception {
         String authToken = req.headers("authorization");
-        var result = gameService.listGames(authToken);
+        var result = GAME_SERVICE.listGames(authToken);
         return serializer.toJson(result);
     }
 
     private String joinGame(Request req, Response res) throws Exception {
         String authToken = req.headers("authorization");
         var joinGameRequest = serializer.fromJson(req.body(), JoinGameRequest.class);
-        gameService.joinGame(joinGameRequest.gameID(), joinGameRequest.playerColor(), authToken);
+        GAME_SERVICE.joinGame(joinGameRequest.gameID(), joinGameRequest.playerColor(), authToken);
         return "";
 
     }
 
     private String clear(Request req, Response res) throws Exception {
-        clearService.clear();
+        CLEAR_SERVICE.clear();
         return "";
     }
 
