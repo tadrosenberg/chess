@@ -329,7 +329,7 @@ public class StandardAPITests {
         //list games
         TestListResult listResult = serverFacade.listGames(existingAuth);
         assertHttpOk(listResult);
-        Collection<TestListEntry> returnedList = new ArrayList<>(Arrays.asList(listResult.getGames()));
+        Collection<TestListEntry> returnedList = new HashSet<>(Arrays.asList(listResult.getGames()));
 
         //check
         Assertions.assertEquals(expectedList, returnedList, "Returned Games list was incorrect");

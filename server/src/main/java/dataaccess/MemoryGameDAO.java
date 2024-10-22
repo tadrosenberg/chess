@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 import service.ServiceException;
 
@@ -14,7 +15,8 @@ public class MemoryGameDAO implements GameDAO {
     public GameData createGame(String gameName) throws DataAccessException {
         int gameID = nextGameID++;
 
-        GameData newGame = new GameData(gameID, null, null, gameName, null);
+        ChessGame newChessGame = new ChessGame();
+        GameData newGame = new GameData(gameID, null, null, gameName, newChessGame);
 
         games.put(gameID, newGame);
 
