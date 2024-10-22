@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.UserData;
 import request.CreateGameRequest;
+import request.JoinGameRequest;
 import service.ClearService;
 import service.GameService;
 import service.ServiceException;
@@ -19,7 +20,7 @@ public class Server {
     private final MemoryGameDAO gameDAO = new MemoryGameDAO();
     private final UserService userService = new UserService(userDAO, authDAO);
     private final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-    private final GameService gameService = new GameService(userDAO, authDAO, gameDAO);
+    private final GameService gameService = new GameService(authDAO, gameDAO);
 
     private final Gson serializer = new Gson();
 
@@ -35,6 +36,7 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::createGame);
         Spark.get("/game", this::listGames);
+        Spark.put("/game", this::joinGame);
         Spark.exception(Exception.class, this::exceptionHandler);
 
 
@@ -79,6 +81,14 @@ public class Server {
         String authToken = req.headers("authorization");
         var result = gameService.listGames(authToken);
         return serializer.toJson(result);
+    }
+
+    private String joinGame(Request req, Response res) throws Exception {
+        String authToken = req.headers("authorization");
+        var joinGameRequest = serializer.fromJson(req.body(), JoinGameRequest.class);
+        gameService.joinGame(joinGameRequest.gameID(), joinGameRequest.playerColor(), authToken);
+        return "";
+
     }
 
     private String clear(Request req, Response res) throws Exception {

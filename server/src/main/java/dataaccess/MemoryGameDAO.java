@@ -8,30 +8,27 @@ import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO {
     private final Map<Integer, GameData> games = new HashMap<>();
-    private int nextGameId = 1;
+    private int nextGameID = 1;
 
     @Override
     public GameData createGame(String gameName) throws DataAccessException {
-        int gameId = nextGameId++;
+        int gameID = nextGameID++;
 
-        GameData newGame = new GameData(gameId, null, null, gameName, null);
+        GameData newGame = new GameData(gameID, null, null, gameName, null);
 
-        games.put(gameId, newGame);
+        games.put(gameID, newGame);
 
-        return games.get(gameId);
-    }
-
-    @Override
-    public GameData getGame(int gameID) throws DataAccessException {
-        if (!games.containsKey(gameID)) {
-            throw new DataAccessException("User not found.");
-        }
         return games.get(gameID);
     }
 
     @Override
-    public GameData updateGame(GameData newGame) throws DataAccessException {
-        return null;
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
+    }
+
+    @Override
+    public void updateGame(GameData newGame) {
+        games.put(newGame.gameID(), newGame);
     }
 
     @Override
@@ -42,6 +39,6 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void clearGameData() throws DataAccessException {
         games.clear();
-        nextGameId = 1;
+        nextGameID = 1;
     }
 }

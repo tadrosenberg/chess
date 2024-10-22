@@ -6,10 +6,7 @@ import passoff.model.*;
 import server.Server;
 
 import java.net.HttpURLConnection;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Locale;
+import java.util.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class StandardAPITests {
@@ -291,7 +288,7 @@ public class StandardAPITests {
         TestUser userA = new TestUser("a", "A", "a.A");
         TestUser userB = new TestUser("b", "B", "b.B");
         TestUser userC = new TestUser("c", "C", "c.C");
-        
+
         TestAuthResult authA = serverFacade.register(userA);
         TestAuthResult authB = serverFacade.register(userB);
         TestAuthResult authC = serverFacade.register(userC);
@@ -332,7 +329,7 @@ public class StandardAPITests {
         //list games
         TestListResult listResult = serverFacade.listGames(existingAuth);
         assertHttpOk(listResult);
-        Collection<TestListEntry> returnedList = new HashSet<>(Arrays.asList(listResult.getGames()));
+        Collection<TestListEntry> returnedList = new ArrayList<>(Arrays.asList(listResult.getGames()));
 
         //check
         Assertions.assertEquals(expectedList, returnedList, "Returned Games list was incorrect");
