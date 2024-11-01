@@ -53,8 +53,10 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
     }
 
     @Override
-    public void updateGame(GameData newGame) {
-        
+    public void updateGame(GameData newGame) throws DataAccessException {
+        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, gameJson = ? WHERE gameID = ?";
+        var json = new Gson().toJson(newGame.game());
+        executeUpdate(statement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), json, newGame.gameID());
     }
 
     @Override
