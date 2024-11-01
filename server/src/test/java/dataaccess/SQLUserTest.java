@@ -9,7 +9,7 @@ import service.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SQLUserDAOTest {
+class SQLUserTest {
 
     private SQLUserDAO userDAO;
 

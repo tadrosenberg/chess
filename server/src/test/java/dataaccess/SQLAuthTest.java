@@ -8,7 +8,7 @@ import service.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SQLAuthDAOTest {
+class SQLAuthTest {
 
     private SQLAuthDAO authDAO;
 

@@ -25,9 +25,7 @@ public class Server {
             authDAO = new SQLAuthDAO();
             gameDAO = new SQLGameDAO();
 
-        } catch (DataAccessException e) {
-
-        } catch (ServiceException e) {
+        } catch (DataAccessException | ServiceException e) {
             throw new RuntimeException(e);
         }
     }
