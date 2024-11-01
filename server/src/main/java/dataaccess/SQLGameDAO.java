@@ -2,12 +2,13 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import model.AuthData;
 import model.GameData;
 import service.ServiceException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SQLGameDAO extends AbstractDAO implements GameDAO {
     private final String[] createStatements = {
@@ -61,12 +62,33 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
 
     @Override
     public GameData[] listGames() throws DataAccessException {
-        return new GameData[0];
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
+        List<GameData> games = new ArrayList<>();
+
+        try (ResultSet rs = executeQuery(statement)) { // Execute the query to get all games
+            while (rs.next()) {
+                var json = rs.getString("gameJson");
+                var serGame = new Gson().fromJson(json, ChessGame.class);
+                GameData game = new GameData(
+                        rs.getInt("gameID"),
+                        rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"),
+                        rs.getString("gameName"),
+                        serGame
+                );
+                games.add(game);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+
+        return games.toArray(new GameData[0]);
     }
 
     @Override
     public void clearGameData() throws DataAccessException {
-
+        var statement = "TRUNCATE game";
+        executeUpdate(statement);
     }
 
     @Override
