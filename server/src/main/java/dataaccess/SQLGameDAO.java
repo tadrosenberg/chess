@@ -6,12 +6,12 @@ import service.ServiceException;
 public class SQLGameDAO extends AbstractDAO implements GameDAO {
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  auth (
+            CREATE TABLE IF NOT EXISTS  game (
               `gameID` INT NOT NULL AUTO_INCREMENT,
-              `whiteUsername` varchar(256) NOT NULL,
-              `blackUsername` varchar(256) NOT NULL,
+              `whiteUsername` varchar(256) DEFAULT NULL,
+              `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
-              `game` varchar(256) NOT NULL,
+              `gameJson` TEXT DEFAULT NULL,
               PRIMARY KEY (`gameID`),
               INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
@@ -24,7 +24,9 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
 
     @Override
     public GameData createGame(String gameName) throws DataAccessException {
-        return null;
+        var statement = "INSERT INTO game (gameName) VALUES (?)";
+        int id = executeUpdate(statement, gameName);
+        return new GameData(id, null, null, gameName, null);
     }
 
     @Override
