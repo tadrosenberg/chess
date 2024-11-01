@@ -14,10 +14,24 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-    
-    private final MemoryUserDAO userDAO = new MemoryUserDAO();
-    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private final MemoryGameDAO gameDAO = new MemoryGameDAO();
+
+    SQLUserDAO userDAO;
+    SQLAuthDAO authDAO;
+    SQLGameDAO gameDAO;
+
+    {
+        try {
+            userDAO = new SQLUserDAO();
+            authDAO = new SQLAuthDAO();
+            gameDAO = new SQLGameDAO();
+
+        } catch (DataAccessException e) {
+
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final UserService userService = new UserService(userDAO, authDAO);
     private final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
     private final GameService gameService = new GameService(authDAO, gameDAO);
