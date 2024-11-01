@@ -3,17 +3,16 @@ package chess;
 import java.util.Collection;
 import java.util.ArrayList;
 
-public class RookMovesCalculator implements PieceMovesCalculator {
+public class RookMovesCalculator {
 
-    @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
+    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
         Collection<ChessPosition> possiblePositions = getRookMoves(board, position);
         MoveUtils.addValidMoves(moves, board, position, possiblePositions);
         return moves;
     }
 
-    private Collection<ChessPosition> getRookMoves(ChessBoard board, ChessPosition myPosition) {
+    private static Collection<ChessPosition> getRookMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessPosition> rookMoves = new ArrayList<>();
         int currentRow = myPosition.getRow();
         int currentCol = myPosition.getColumn();
@@ -59,7 +58,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         return rookMoves;
     }
 
-    private boolean isWithinBounds(int row, int col) {
+    private static boolean isWithinBounds(int row, int col) {
         return row >= 1 && row < 9 && col >= 1 && col < 9; // Assuming an 8x8 chessboard
     }
 }

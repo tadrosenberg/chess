@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import static chess.ChessPiece.PieceType.*;
 import static chess.ChessGame.TeamColor.*;
 
-public class PawnMovesCalculator implements PieceMovesCalculator {
+public class PawnMovesCalculator {
 
-    @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
+    public static Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
         // Implement logic to calculate pawn's moves
         for (ChessPosition pos : getPawnMoves(board, position)) {
@@ -26,7 +25,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         return moves;
     }
 
-    private void doPromotionMove(ChessPosition position, Collection<ChessMove> moves, ChessPosition pos, boolean isPromotionMove) {
+    private static void doPromotionMove(ChessPosition position, Collection<ChessMove> moves, ChessPosition pos, boolean isPromotionMove) {
         if (isPromotionMove) {
             moves.add(new ChessMove(position, pos, QUEEN));
             moves.add(new ChessMove(position, pos, ROOK));
@@ -37,7 +36,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         }
     }
 
-    private Collection<ChessPosition> getPawnMoves(ChessBoard board, ChessPosition myPosition) {
+    private static Collection<ChessPosition> getPawnMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessPosition> pawnMoves = new ArrayList<>();
         int currentRow = myPosition.getRow();
         int currentCol = myPosition.getColumn();
@@ -78,7 +77,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         return pawnMoves;
     }
 
-    private boolean isWithinBounds(int row, int col) {
+    private static boolean isWithinBounds(int row, int col) {
         return row >= 1 && row < 9 && col >= 1 && col < 9; // Assuming an 8x8 chessboard
     }
 }
