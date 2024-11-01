@@ -4,7 +4,7 @@ import model.UserData;
 import service.ServiceException;
 
 public interface UserDAO {
-    UserData createUser(UserData user) throws ServiceException;
+    UserData createUser(UserData user) throws ServiceException, DataAccessException;
 
     UserData getUser(String username) throws DataAccessException;
 

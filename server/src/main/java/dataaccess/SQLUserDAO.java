@@ -1,12 +1,15 @@
 package dataaccess;
 
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.ServiceException;
+
+import java.sql.ResultSet;
 
 public class SQLUserDAO extends AbstractDAO implements UserDAO {
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  auth (
+            CREATE TABLE IF NOT EXISTS  user (
               `username` varchar(256) NOT NULL,
               `password` varchar(256) NOT NULL,
               'email' varchar(256) NOT NULL,
@@ -25,10 +28,11 @@ public class SQLUserDAO extends AbstractDAO implements UserDAO {
     }
 
     @Override
-    public UserData createUser(UserData user) throws ServiceException {
-        var statement = "INSERT INTO auth (token, username) VALUES (?, ?)";
-
-        
+    public UserData createUser(UserData user) throws ServiceException, DataAccessException {
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?)";
+        executeUpdate(statement, user.username(), hashedPassword, user.email());
+        return new UserData(user.username(), user.password(), user.email());
     }
 
     @Override
