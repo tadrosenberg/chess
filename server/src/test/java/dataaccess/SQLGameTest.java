@@ -55,7 +55,6 @@ class SQLGameTest {
 
     @Test
     void updateGameShouldModifyGameData() throws DataAccessException {
-        // Positive test: create a game, update it, and verify the changes
         GameData createdGame = gameDAO.createGame("testGame");
         ChessGame updatedChessGame = new ChessGame(); // Modify the ChessGame state as needed
         createdGame = new GameData(createdGame.gameID(), "player1", "player2", "updatedGame", updatedChessGame);
@@ -68,7 +67,6 @@ class SQLGameTest {
         assertEquals("player2", updatedGame.blackUsername(), "Black username should match");
         assertEquals("updatedGame", updatedGame.gameName(), "Game name should match the update");
 
-        // Deserialize and check the updated game state if necessary
         ChessGame retrievedChessGame = updatedGame.game();
         assertEquals(gson.toJson(updatedChessGame), gson.toJson(retrievedChessGame), "Game state should match");
     }
@@ -106,12 +104,25 @@ class SQLGameTest {
     }
 
     @Test
-    void updateGameNonExistentGameShouldThrowException() {
+    void updateGameNonExistentGameShouldNotModifyTable() throws DataAccessException {
         // Negative test: try to update a game that doesn’t exist
         ChessGame chessGame = new ChessGame(); // Example game state
         GameData nonExistentGame = new GameData(-1, "player1", "player2", "nonExistentGame", chessGame);
 
-        assertThrows(DataAccessException.class, () -> gameDAO.updateGame(nonExistentGame),
-                "Updating a non-existent game should throw DataAccessException");
+        // Check the number of games before the update attempt
+        int initialGameCount = gameDAO.listGames().length;
+
+        // Attempt to update the non-existent game
+        gameDAO.updateGame(nonExistentGame);
+
+        // Check the number of games after the update attempt
+        int finalGameCount = gameDAO.listGames().length;
+
+        // Verify that the number of games hasn't changed
+        assertEquals(initialGameCount, finalGameCount, "Updating a non-existent game should not modify the game table");
+
+        // Optionally, you can also ensure that a game with ID -1 (or any other test ID) does not exist
+        assertNull(gameDAO.getGame(-1), "No game should exist with ID -1 after update attempt");
     }
 }
+

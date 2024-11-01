@@ -61,7 +61,7 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
 
     @Override
     public GameData[] listGames() throws DataAccessException {
-        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson FROM game";
         List<GameData> games = new ArrayList<>();
 
         try (ResultSet rs = executeQuery(statement)) { // Execute the query to get all games
