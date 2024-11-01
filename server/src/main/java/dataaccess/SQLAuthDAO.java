@@ -42,9 +42,8 @@ public class SQLAuthDAO extends AbstractDAO implements AuthDAO {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         var statement = "SELECT token, username FROM auth WHERE token=?";
-        ResultSet rs = executeQuery(statement, authToken);
-        try {
-            if (rs.next()) {  // Move to the first result row
+        try (ResultSet rs = executeQuery(statement, authToken)) {
+            if (rs.next()) {
                 return new AuthData(rs.getString("token"), rs.getString("username"));
             }
         } catch (SQLException ex) {

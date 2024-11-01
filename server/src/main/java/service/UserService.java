@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import result.LoginResult;
 
 public class UserService {
@@ -38,8 +39,10 @@ public class UserService {
             throw new ServiceException(401, "Error: unauthorized");
         }
 
-        // Verify the password (you might want to add password hashing here)
-        if (!existingUser.password().equals(user.password())) {
+        String providedPassword = user.password();
+        String hashedPassword = existingUser.password();
+
+        if (!BCrypt.checkpw(providedPassword, hashedPassword)) {
             throw new ServiceException(401, "Error: unauthorized");
         }
 
