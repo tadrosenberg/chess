@@ -30,7 +30,10 @@ public class SQLUserDAO extends AbstractDAO implements UserDAO {
     }
 
     @Override
-    public UserData createUser(UserData user) throws DataAccessException {
+    public UserData createUser(UserData user) throws DataAccessException, ServiceException {
+        if (getUser(user.username()) != null) {
+            throw new ServiceException(403, "Error: already taken");
+        }
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, user.username(), hashedPassword, user.email());

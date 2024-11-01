@@ -54,7 +54,6 @@ public class UserService {
 
     // Log out a user by invalidating their auth token
     public void logout(String authToken) throws ServiceException, DataAccessException {
-        // Invalidate the user's auth token by deleting it
         if (authDAO.getAuth(authToken) == null) {
             throw new ServiceException(401, "Error: unauthorized");
         }

@@ -24,7 +24,7 @@ class SQLUserDAOTest {
     }
 
     @Test
-    void createUserValidDataShouldCreateUser() throws DataAccessException {
+    void createUserValidDataShouldCreateUser() throws DataAccessException, ServiceException {
         // Positive test: create a valid user and check if it was inserted correctly
         UserData user = new UserData("testUser", "testPassword", "testUser@example.com");
         UserData createdUser = userDAO.createUser(user);
@@ -43,13 +43,13 @@ class SQLUserDAOTest {
     }
 
     @Test
-    void createUserDuplicateUsernameShouldThrowException() throws DataAccessException {
+    void createUserDuplicateUsernameShouldThrowException() throws DataAccessException, ServiceException {
         // Negative test: create a user, then try creating another user with the same username
         UserData user = new UserData("testUser", "testPassword", "testUser@example.com");
         userDAO.createUser(user);
 
         UserData duplicateUser = new UserData("testUser", "anotherPassword", "duplicate@example.com");
-        assertThrows(DataAccessException.class, () -> userDAO.createUser(duplicateUser),
+        assertThrows(ServiceException.class, () -> userDAO.createUser(duplicateUser),
                 "Creating a user with a duplicate username should throw a DataAccessException");
     }
 
@@ -61,7 +61,7 @@ class SQLUserDAOTest {
     }
 
     @Test
-    void clearUserDataShouldRemoveAllUsers() throws DataAccessException {
+    void clearUserDataShouldRemoveAllUsers() throws DataAccessException, ServiceException {
         // Positive test: create multiple users, then clear them all
         userDAO.createUser(new UserData("user1", "password1", "user1@example.com"));
         userDAO.createUser(new UserData("user2", "password2", "user2@example.com"));
