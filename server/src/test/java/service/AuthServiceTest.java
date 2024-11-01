@@ -22,7 +22,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void createAuthValidUsernameSuccess() {
+    void createAuthValidUsernameSuccess() throws DataAccessException {
         String username = "testUser";
         AuthData authData = authService.createAuth(username);
 
@@ -32,7 +32,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void createAuthNullUsernameSuccess() {
+    void createAuthNullUsernameSuccess() throws DataAccessException {
         // You may want to throw an exception or handle null username validation,
         // but for now it doesn't throw an exception, and just creates auth with null.
         AuthData authData = authService.createAuth(null);
@@ -43,7 +43,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void getAuthValidAuthTokenSuccess() {
+    void getAuthValidAuthTokenSuccess() throws DataAccessException {
         String username = "testUser";
         AuthData createdAuthData = authService.createAuth(username);
 
@@ -55,7 +55,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void getAuthInvalidAuthTokenReturnsNull() {
+    void getAuthInvalidAuthTokenReturnsNull() throws DataAccessException {
         AuthData authData = authService.getAuth("invalidToken");
 
         assertNull(authData);  // Since no exception is thrown, it should return null for invalid tokens

@@ -11,11 +11,11 @@ public class AuthService {
         this.authDAO = authDAO;
     }
 
-    public AuthData createAuth(String username) {
+    public AuthData createAuth(String username) throws DataAccessException {
         return authDAO.createAuth(username);
     }
 
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         return authDAO.getAuth(authToken);
     }
 

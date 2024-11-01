@@ -14,7 +14,7 @@ import spark.*;
 import java.util.Map;
 
 public class Server {
-
+    
     private final MemoryUserDAO userDAO = new MemoryUserDAO();
     private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
     private final MemoryGameDAO gameDAO = new MemoryGameDAO();

@@ -18,7 +18,7 @@ public class UserService {
     }
 
     // Register a new user and return their auth token
-    public AuthData register(UserData user) throws ServiceException {
+    public AuthData register(UserData user) throws ServiceException, DataAccessException {
         if (user.username() == null || user.username().isEmpty() ||
                 user.password() == null || user.password().isEmpty() ||
                 user.email() == null || user.email().isEmpty()) {
