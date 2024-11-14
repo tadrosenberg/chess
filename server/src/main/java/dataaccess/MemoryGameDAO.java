@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
-import service.ServiceException;
 
 import java.util.HashMap;
 import java.util.Map;

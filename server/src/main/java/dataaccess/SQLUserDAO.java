@@ -3,7 +3,7 @@ package dataaccess;
 import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
-import service.ServiceException;
+import exception.ServiceException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

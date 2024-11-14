@@ -7,7 +7,7 @@ import request.CreateGameRequest;
 import request.JoinGameRequest;
 import service.ClearService;
 import service.GameService;
-import service.ServiceException;
+import exception.ServiceException;
 import service.UserService;
 import spark.*;
 

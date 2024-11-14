@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import model.GameData;
+import exception.ServiceException;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

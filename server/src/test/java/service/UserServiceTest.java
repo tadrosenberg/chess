@@ -1,5 +1,6 @@
 package service;
 
+import exception.ServiceException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.DataAccessException;
@@ -35,7 +36,7 @@ class UserServiceTest {
 
     // Test Register
     @Test
-    void testRegister() throws ServiceException, DataAccessException {
+    void testRegister() throws DataAccessException, ServiceException {
         // Positive case: Register a new user
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         AuthData authData = userService.register(newUser);
@@ -64,7 +65,7 @@ class UserServiceTest {
 
     // Test Login
     @Test
-    void testLogin() throws ServiceException, DataAccessException {
+    void testLogin() throws DataAccessException, ServiceException {
         // Positive case: Log in with correct credentials
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         userService.register(newUser);
@@ -85,7 +86,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testLoginInvalidPassword() throws ServiceException, DataAccessException {
+    void testLoginInvalidPassword() throws DataAccessException, ServiceException {
         // Negative case: Login with incorrect password
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         userService.register(newUser);
@@ -96,7 +97,7 @@ class UserServiceTest {
 
     // Test Logout
     @Test
-    void testLogout() throws ServiceException, DataAccessException {
+    void testLogout() throws DataAccessException, ServiceException {
         // Positive case: Log out a user
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         AuthData authData = userService.register(newUser);

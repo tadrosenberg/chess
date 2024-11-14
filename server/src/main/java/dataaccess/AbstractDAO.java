@@ -1,6 +1,6 @@
 package dataaccess;
 
-import service.ServiceException;
+import exception.ServiceException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

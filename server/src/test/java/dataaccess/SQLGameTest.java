@@ -6,7 +6,7 @@ import chess.ChessGame;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.ServiceException;
+import exception.ServiceException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

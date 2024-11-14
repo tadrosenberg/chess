@@ -23,7 +23,7 @@ class ClearServiceTest {
     }
 
     @Test
-    void testClearDataSuccess() throws DataAccessException, ServiceException {
+    void testClearDataSuccess() throws DataAccessException, exception.ServiceException {
         // Add some dummy data
         authDAO.createAuth("AUTH_TOKEN");
         userDAO.createUser(new UserData("testUser", "password", "email@example.com"));

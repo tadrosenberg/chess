@@ -7,6 +7,7 @@ import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 import result.LoginResult;
+import exception.ServiceException;
 
 public class UserService {
 
