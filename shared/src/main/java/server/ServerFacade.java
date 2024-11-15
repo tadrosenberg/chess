@@ -48,6 +48,10 @@ public class ServerFacade {
         makeRequest("PUT", "/game", request, null, authToken);
     }
 
+    public void clearDatabase() throws ServiceException {
+        makeRequest("DELETE", "/db", null, null); // Adjust as needed if your clear endpoint differs
+    }
+
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ServiceException {
         return makeRequest(method, path, request, responseClass, null); // Call overloaded method with no authToken
     }
