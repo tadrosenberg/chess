@@ -30,9 +30,19 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
 
     @Override
     public GameData createGame(String gameName) throws DataAccessException {
-        var statement = "INSERT INTO game (gameName) VALUES (?)";
-        int id = executeUpdate(statement, gameName);
-        return new GameData(id, null, null, gameName, null);
+        ChessGame game = new ChessGame();
+        String gameJson = serializeChessGame(game);
+        String statement = "INSERT INTO game (gameName, gameJson) VALUES (?, ?)";
+        int id = executeUpdate(statement, gameName, gameJson);
+        return new GameData(id, null, null, gameName, game);
+    }
+
+    private String serializeChessGame(ChessGame chessGame) throws DataAccessException {
+        try {
+            return new Gson().toJson(chessGame);
+        } catch (Exception e) {
+            throw new DataAccessException("Error serializing ChessGame to JSON");
+        }
     }
 
     @Override

@@ -25,6 +25,7 @@ public class GameService {
         if (gameName == null || gameName.isEmpty()) {
             throw new ServiceException(400, "Error: bad request");
         }
+        
         GameData newGame = gameDAO.createGame(gameName);
 
         return new CreateGameResult(newGame.gameID());
