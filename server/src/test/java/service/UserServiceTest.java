@@ -1,9 +1,7 @@
 package service;
 
+import dataaccess.*;
 import exception.ServiceException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     private UserService userService;
-    private MemoryUserDAO userDAO;
-    private MemoryAuthDAO authDAO;
+    private SQLUserDAO userDAO;
+    private SQLAuthDAO authDAO;
 
     // Constants
     private static final String VALID_USERNAME = "validUser";
@@ -27,10 +25,16 @@ class UserServiceTest {
     private static final String INVALID_AUTH_TOKEN = "invalidToken";
 
     @BeforeEach
-    void setUp() {
-        // Initialize in-memory DAOs and service for each test
-        userDAO = new MemoryUserDAO();
-        authDAO = new MemoryAuthDAO();
+    void setUp() throws ServiceException, DataAccessException {
+        // Initialize DAOs and service for each test
+        userDAO = new SQLUserDAO();
+        authDAO = new SQLAuthDAO();
+
+        // Clear the database
+        userDAO.clearUserData();
+        authDAO.clearAuthData();
+
+        // Initialize the UserService
         userService = new UserService(userDAO, authDAO);
     }
 
