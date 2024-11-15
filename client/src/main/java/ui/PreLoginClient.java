@@ -21,7 +21,9 @@ public class PreLoginClient {
 
     public LoginResult login(String username, String password) throws ServiceException {
         UserData user = new UserData(username, password, null);
-        return serverFacade.login(user);
+        LoginResult loginResult = serverFacade.login(user);
+        this.authToken = loginResult.authToken();
+        return loginResult;
     }
 
     public void start() {

@@ -14,6 +14,7 @@ public class PostLoginRepl {
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
+        System.out.println("Logged in! Type 'help' to get started.");
 
         boolean running = true;
         while (running) {
@@ -26,9 +27,11 @@ public class PostLoginRepl {
                 case "create" -> handleCreate(scanner);
                 case "join" -> {
                     running = false;
+                    System.out.println("printing board");
                 }
                 case "observe" -> {
                     running = false;
+                    System.out.println("printing board");
                 }
                 case "list" -> handleList(scanner);
                 default -> System.out.println("Unknown command. Type 'help' for a list of valid commands.");
@@ -62,7 +65,12 @@ public class PostLoginRepl {
 
     private void handleList(Scanner scanner) {
         try {
-            postLoginClient.list();
+            String games = postLoginClient.list();
+            if (games.isEmpty()) {
+                System.out.println("No games found!");
+            } else {
+                System.out.println(games);
+            }
         } catch (ServiceException ex) {
             System.out.println("Listing failed: " + ex.getMessage());
         }

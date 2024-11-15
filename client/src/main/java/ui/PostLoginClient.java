@@ -23,7 +23,7 @@ public class PostLoginClient {
 
     public String list() throws ServiceException {
         ListGamesResult gamesResult = serverFacade.listGames(authToken);
-        StringBuilder sb = new StringBuilder("Available games:\n");
+        StringBuilder sb = new StringBuilder();
         int count = 1;
         for (GameData game : gamesResult.games()) {
             sb.append(count++).append(". ")
