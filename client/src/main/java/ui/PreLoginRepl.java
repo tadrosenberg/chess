@@ -41,5 +41,46 @@ public class PreLoginRepl {
         }
     }
 
+    private void displayHelp() {
+        System.out.println("""
+                Commands:
+                - register: Create a new account.
+                - login: Log in to an existing account.
+                - quit: Exit the application.
+                - help: Display this help text.
+                """);
+    }
+
+    private void handleRegister(Scanner scanner) {
+        try {
+            System.out.print("Enter username: ");
+            String username = scanner.nextLine().trim();
+            System.out.print("Enter password: ");
+            String password = scanner.nextLine().trim();
+            System.out.print("Enter email: ");
+            String email = scanner.nextLine().trim();
+
+            preLoginClient.register(username, password, email);
+            System.out.println("Registration successful! Call the login command next.");
+        } catch (ServiceException ex) {
+            System.out.println("Registration failed: " + ex.getMessage());
+        }
+    }
+
+    private LoginResult handleLogin(Scanner scanner) {
+        try {
+            System.out.print("Enter username: ");
+            String username = scanner.nextLine().trim();
+            System.out.print("Enter password: ");
+            String password = scanner.nextLine().trim();
+
+            return preLoginClient.login(username, password);
+        } catch (ServiceException ex) {
+            System.out.println("Login failed: " + ex.getMessage());
+            return null;
+        }
+    }
+
+
 }
 
