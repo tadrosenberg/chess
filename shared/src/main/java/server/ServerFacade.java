@@ -89,9 +89,20 @@ public class ServerFacade {
     }
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ServiceException {
-        var status = http.getResponseCode();
+        int status = http.getResponseCode();
+        String errorMessage;
+
         if (!isSuccessful(status)) {
-            throw new ServiceException(status, "failure: " + status);
+            switch (status) {
+                case 400 -> errorMessage = "Bad request: Please check your input and try again.";
+                case 401 -> errorMessage = "Unauthorized: Invalid credentials, please try logging in again.";
+                case 403 -> errorMessage = "Already taken: The requested resource is already in use.";
+                case 404 -> errorMessage = "Not found: The requested resource could not be located.";
+                case 500 -> errorMessage = "Server error: There was a problem on the server. Please try again later.";
+                default -> errorMessage = "Unknown error.";
+            }
+
+            throw new ServiceException(status, errorMessage);
         }
     }
 

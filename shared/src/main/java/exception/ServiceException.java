@@ -12,4 +12,8 @@ public class ServiceException extends Exception {
     public int getStatusCode() {
         return statusCode;
     }
+
+    public String getMessage() {
+        return super.getMessage();
+    }
 }
