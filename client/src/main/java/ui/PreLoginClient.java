@@ -24,7 +24,6 @@ public class PreLoginClient {
         return serverFacade.login(user);
     }
 
-
     public void start() {
         PreLoginRepl preLoginRepl = new PreLoginRepl(this);
         preLoginRepl.run();

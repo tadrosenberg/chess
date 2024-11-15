@@ -35,6 +35,10 @@ public class PostLoginClient {
         return sb.toString();
     }
 
+    public void logout() throws ServiceException {
+        serverFacade.logout(authToken);
+    }
+
     public void start() {
         PostLoginRepl postLoginRepl = new PostLoginRepl(this);
         postLoginRepl.run();

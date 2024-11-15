@@ -24,8 +24,12 @@ public class PostLoginRepl {
                 case "help" -> displayHelp();
                 case "logout" -> handleLogout(scanner);
                 case "create" -> handleCreate(scanner);
-                case "join" -> handleJoin(scanner);
-                case "observe" -> handleObserve(scanner);
+                case "join" -> {
+                    running = false;
+                }
+                case "observe" -> {
+                    running = false;
+                }
                 case "list" -> handleList(scanner);
                 default -> System.out.println("Unknown command. Type 'help' for a list of valid commands.");
             }
@@ -61,6 +65,14 @@ public class PostLoginRepl {
             postLoginClient.list();
         } catch (ServiceException ex) {
             System.out.println("Listing failed: " + ex.getMessage());
+        }
+    }
+
+    private void handleLogout(Scanner scanner) {
+        try {
+            postLoginClient.logout();
+        } catch (ServiceException ex) {
+            System.out.println("Logout failed: " + ex.getMessage());
         }
     }
 }
