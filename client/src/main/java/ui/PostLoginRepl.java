@@ -3,7 +3,6 @@ package ui;
 import java.util.Scanner;
 
 import exception.ServiceException;
-import result.LoginResult;
 
 public class PostLoginRepl {
     private final PostLoginClient postLoginClient; // Dependency on the client
@@ -30,11 +29,11 @@ public class PostLoginRepl {
                 case "create" -> handleCreate(scanner);
                 case "join" -> {
                     running = false;
-                    System.out.println("printing board");
+                    handleJoin(scanner);
                 }
                 case "observe" -> {
                     running = false;
-                    System.out.println("printing board");
+                    handleObserve(scanner);
                 }
                 case "list" -> handleList(scanner);
                 default -> System.out.println("Unknown command. Type 'help' for a list of valid commands.");
@@ -85,6 +84,38 @@ public class PostLoginRepl {
             postLoginClient.logout();
         } catch (ServiceException ex) {
             System.out.println("Logout failed: " + ex.getMessage());
+        }
+    }
+
+    private void handleObserve(Scanner scanner) {
+        System.out.print("Enter game # to observe: ");
+        int gameNumber;
+        try {
+            gameNumber = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character after the integer
+
+            //use id
+            postLoginClient.observe(gameNumber);
+
+        } catch (ServiceException ex) {
+            System.out.println("Observe failed: " + ex.getMessage());
+        }
+
+    }
+
+    private void handleJoin(Scanner scanner) {
+        System.out.print("Enter game # to join: ");
+        System.out.print("Enter color ('WHITE' or 'BLACK'): ");
+        int gameNumber;
+        try {
+            gameNumber = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character after the integer
+
+            //use id
+            postLoginClient.join(gameNumberm);
+
+        } catch (ServiceException ex) {
+            System.out.println("Observe failed: " + ex.getMessage());
         }
     }
 }
