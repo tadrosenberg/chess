@@ -3,7 +3,6 @@ package ui;
 import java.util.Scanner;
 
 import exception.ServiceException;
-import model.UserData;
 import result.LoginResult;
 
 public class PreLoginRepl {
