@@ -6,6 +6,8 @@ import request.CreateGameRequest;
 import request.JoinGameRequest;
 import result.ListGamesResult;
 import server.ServerFacade;
+import chess.ChessGame;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -70,6 +72,11 @@ public class PostLoginClient {
             return gamesList.get(gameNumber - 1);
         }
         return null;
+    }
+
+    private void startPrintBoard(ChessGame game) {
+        ChessBoardPrinter.printBoard(game.getBoard(), ChessGame.TeamColor.WHITE);
+        ChessBoardPrinter.printBoard(game.getBoard(), ChessGame.TeamColor.BLACK);
     }
 
     public void start() {
