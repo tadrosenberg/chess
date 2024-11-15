@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import exception.ServiceException;
@@ -104,18 +105,23 @@ public class PostLoginRepl {
     }
 
     private void handleJoin(Scanner scanner) {
-        System.out.print("Enter game # to join: ");
-        System.out.print("Enter color ('WHITE' or 'BLACK'): ");
-        int gameNumber;
         try {
-            gameNumber = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character after the integer
+            System.out.print("Enter game number to join: ");
+            int gameNumber = scanner.nextInt();
+            scanner.nextLine();
 
-            //use id
-            postLoginClient.join(gameNumberm);
+            System.out.print("Enter color ('WHITE' or 'BLACK'): ");
+            String color = scanner.nextLine().trim().toUpperCase();
+
+            postLoginClient.join(gameNumber, color);
+
+            System.out.println("Joined game successfully!");
 
         } catch (ServiceException ex) {
-            System.out.println("Observe failed: " + ex.getMessage());
+            System.out.println("Join failed: " + ex.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid game number.");
+            scanner.nextLine();
         }
     }
 }
