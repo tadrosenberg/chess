@@ -41,6 +41,9 @@ public class PostLoginClient {
 
     public void start() {
         PostLoginRepl postLoginRepl = new PostLoginRepl(this);
-        postLoginRepl.run();
+        boolean loggedOut = postLoginRepl.run();
+        if (loggedOut) {
+            System.out.println("You have been logged out.");
+        }
     }
 }

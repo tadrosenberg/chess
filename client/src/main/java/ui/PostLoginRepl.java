@@ -12,7 +12,7 @@ public class PostLoginRepl {
         this.postLoginClient = postLoginClient;
     }
 
-    public void run() {
+    public boolean run() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Logged in! Type 'help' to get started.");
 
@@ -23,7 +23,10 @@ public class PostLoginRepl {
 
             switch (input) {
                 case "help" -> displayHelp();
-                case "logout" -> handleLogout(scanner);
+                case "logout" -> {
+                    handleLogout(scanner);
+                    return true;
+                }
                 case "create" -> handleCreate(scanner);
                 case "join" -> {
                     running = false;
@@ -37,6 +40,7 @@ public class PostLoginRepl {
                 default -> System.out.println("Unknown command. Type 'help' for a list of valid commands.");
             }
         }
+        return false;
     }
 
     private void displayHelp() {

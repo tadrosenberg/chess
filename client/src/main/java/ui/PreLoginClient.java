@@ -28,9 +28,19 @@ public class PreLoginClient {
 
     public void start() {
         PreLoginRepl preLoginRepl = new PreLoginRepl(this);
-        preLoginRepl.run();
 
-        PostLoginClient postLoginClient = new PostLoginClient(serverFacade, authToken);
-        postLoginClient.start();
+        while (true) {
+            preLoginRepl.run();
+
+            if (authToken != null) {
+                PostLoginClient postLoginClient = new PostLoginClient(serverFacade, authToken);
+                postLoginClient.start();
+
+                authToken = null;
+            } else {
+                break;
+            }
+        }
+
     }
 }
