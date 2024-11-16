@@ -7,12 +7,6 @@ import chess.ChessPosition;
 
 public class ChessBoardPrinter {
 
-    /**
-     * Prints the chess board from the specified team's perspective.
-     *
-     * @param board       the ChessBoard to print
-     * @param perspective the perspective to print from (WHITE or BLACK)
-     */
     public static void printBoard(ChessBoard board, ChessGame.TeamColor perspective) {
         System.out.println(perspective == ChessGame.TeamColor.WHITE ? "White's Perspective:" : "Black's Perspective:");
         renderBoard(board, perspective == ChessGame.TeamColor.WHITE);
@@ -20,9 +14,9 @@ public class ChessBoardPrinter {
 
     private static void renderBoard(ChessBoard board, boolean isWhitePerspective) {
         // Set up row and column labels
-        String columns = "  a b c d e f g h";
+        String columns = "   a  b  c  d  e  f  g  h";
         if (!isWhitePerspective) {
-            columns = new StringBuilder(columns).reverse().toString();
+            columns = "   h  g  f  e  d  c  b  a";
         }
         System.out.println(columns);
 

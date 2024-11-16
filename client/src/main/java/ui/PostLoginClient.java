@@ -51,27 +51,29 @@ public class PostLoginClient {
 
     public void observe(int gameNumber) throws ServiceException {
         if (getGameByNumber(gameNumber) != null) {
-            System.out.println("printing board");
+            startPrintBoard(new ChessGame());
         } else {
             throw new ServiceException(401, "game not found");
         }
     }
 
     public void join(int gameNumber, String playerColor) throws ServiceException {
-        if (getGameByNumber(gameNumber) != null || !Objects.equals(playerColor, "WHITE") || !Objects.equals(playerColor, "BLACK")) {
-            JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, getGameByNumber(gameNumber).gameID());
+        GameData gameData = getGameByNumber(gameNumber);
+        if (gameData != null && (Objects.equals(playerColor, "WHITE") || Objects.equals(playerColor, "BLACK"))) {
+
+            JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameData.gameID());
             serverFacade.joinGame(joinGameRequest, authToken);
-            System.out.println("printing board");
+            startPrintBoard(new ChessGame());
         } else {
             throw new ServiceException(401, "game not found");
         }
     }
 
-    private GameData getGameByNumber(int gameNumber) {
-        if (gameNumber > 0 && gameNumber <= gamesList.size()) {
-            return gamesList.get(gameNumber - 1);
+    private GameData getGameByNumber(int gameNumber) throws ServiceException {
+        if (gamesList == null || gameNumber < 1 || gameNumber > gamesList.size()) {
+            throw new ServiceException(404, "Game not found.");
         }
-        return null;
+        return gamesList.get(gameNumber - 1);
     }
 
     private void startPrintBoard(ChessGame game) {
