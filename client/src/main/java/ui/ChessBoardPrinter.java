@@ -33,8 +33,9 @@ public class ChessBoardPrinter {
                 ChessPosition pos = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(pos);
 
-                // Choose square color
+                // Explicitly alternate colors
                 boolean isLightSquare = (row + col) % 2 == 0;
+
                 String squareColor = isLightSquare
                         ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY
                         : EscapeSequences.SET_BG_COLOR_DARK_GREY;
@@ -52,6 +53,7 @@ public class ChessBoardPrinter {
 
         System.out.println(columns); // Columns at the bottom
     }
+
 
     private static String getUnicodeForPiece(ChessPiece piece) {
         return switch (piece.getPieceType()) {

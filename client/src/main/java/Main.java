@@ -8,7 +8,7 @@ public class Main {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Server: " + piece);
 
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080"); // Update to your actual server URL
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         PreLoginClient preLoginClient = new PreLoginClient(serverFacade);
         preLoginClient.start();
     }
