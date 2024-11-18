@@ -7,9 +7,11 @@ import chess.ChessPosition;
 
 public class ChessBoardPrinter {
 
-    public static void printBoard(ChessBoard board, ChessGame.TeamColor perspective) {
-        System.out.println(perspective == ChessGame.TeamColor.WHITE ? "White's Perspective:" : "Black's Perspective:");
-        renderBoard(board, perspective == ChessGame.TeamColor.WHITE);
+    public static void printBoard(ChessBoard board) {
+        System.out.println("Black's Perspective:");
+        renderBoard(board, false); // White's perspective
+        System.out.println("\nWhite's Perspective:");
+        renderBoard(board, true); // Black's perspective
     }
 
     private static void renderBoard(ChessBoard board, boolean isWhitePerspective) {
@@ -17,22 +19,23 @@ public class ChessBoardPrinter {
         String columns = isWhitePerspective ? "   a  b  c  d  e  f  g  h" : "   h  g  f  e  d  c  b  a";
         System.out.println(columns);
 
-        // Iterate through rows based on perspective
+        // Define row iteration based on perspective
         int startRow = isWhitePerspective ? 8 : 1;
         int endRow = isWhitePerspective ? 1 : 8;
         int rowStep = isWhitePerspective ? -1 : 1;
 
+        // Iterate over rows
         for (int row = startRow; row != endRow + rowStep; row += rowStep) {
             System.out.print(row + " "); // Print row label
 
-            // Iterate through columns based on perspective
+            // Iterate over columns based on perspective
             for (int col = 1; col <= 8; col++) {
-                int displayCol = isWhitePerspective ? col : 9 - col; // Reverse column for Black perspective
+                int displayCol = isWhitePerspective ? 9 - col : col; // Reverse columns for Black perspective
                 ChessPosition pos = new ChessPosition(row, displayCol);
                 ChessPiece piece = board.getPiece(pos);
 
-                // Determine square color
-                boolean isLightSquare = (row + displayCol) % 2 == 1;
+                // Determine square color (ensure top-left and bottom-right are white)
+                boolean isLightSquare = (row + displayCol) % 2 == 0;
                 String squareColor = isLightSquare
                         ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY
                         : EscapeSequences.SET_BG_COLOR_DARK_GREY;
@@ -50,7 +53,6 @@ public class ChessBoardPrinter {
 
         System.out.println(columns); // Print column labels again at the bottom
     }
-
 
     private static String getUnicodeForPiece(ChessPiece piece) {
         return switch (piece.getPieceType()) {

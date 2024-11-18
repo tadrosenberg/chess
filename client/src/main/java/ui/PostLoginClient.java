@@ -77,8 +77,7 @@ public class PostLoginClient {
     }
 
     private void startPrintBoard(ChessGame game) {
-        ChessBoardPrinter.printBoard(game.getBoard(), ChessGame.TeamColor.WHITE);
-        ChessBoardPrinter.printBoard(game.getBoard(), ChessGame.TeamColor.BLACK);
+        ChessBoardPrinter.printBoard(game.getBoard());
     }
 
     public void start() {
