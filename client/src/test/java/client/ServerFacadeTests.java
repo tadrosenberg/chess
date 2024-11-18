@@ -44,7 +44,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testRegister_Success() throws ServiceException {
+    public void testRegisterSuccess() throws ServiceException {
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         AuthData authData = serverFacade.register(newUser);
 
@@ -53,13 +53,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testRegister_Failure() {
+    public void testRegisterFailure() {
         UserData newUser = new UserData("", VALID_PASSWORD, VALID_EMAIL);
         assertThrows(ServiceException.class, () -> serverFacade.register(newUser));
     }
 
     @Test
-    public void testLogin_Success() throws ServiceException {
+    public void testLoginSuccess() throws ServiceException {
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         serverFacade.register(newUser);
 
@@ -70,13 +70,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogin_Failure() {
+    public void testLoginFailure() {
         UserData invalidUser = new UserData("nonExistentUser", VALID_PASSWORD, VALID_EMAIL);
         assertThrows(ServiceException.class, () -> serverFacade.login(invalidUser));
     }
 
     @Test
-    public void testLogout_Success() throws ServiceException {
+    public void testLogoutSuccess() throws ServiceException {
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         AuthData authData = serverFacade.register(newUser);
 
@@ -84,12 +84,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogout_Failure() {
+    public void testLogoutFailure() {
         assertThrows(ServiceException.class, () -> serverFacade.logout(INVALID_AUTH_TOKEN));
     }
 
     @Test
-    public void testCreateGame_Success() throws ServiceException {
+    public void testCreateGameSuccess() throws ServiceException {
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         AuthData authData = serverFacade.register(newUser);
 
@@ -101,13 +101,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testCreateGame_Failure() {
+    public void testCreateGameFailure() {
         CreateGameRequest request = new CreateGameRequest("TestGame");
         assertThrows(ServiceException.class, () -> serverFacade.createGame(request, INVALID_AUTH_TOKEN));
     }
 
     @Test
-    public void testListGames_Success() throws ServiceException {
+    public void testListGamesSuccess() throws ServiceException {
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         AuthData authData = serverFacade.register(newUser);
 
@@ -117,12 +117,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testListGames_Failure() {
+    public void testListGamesFailure() {
         assertThrows(ServiceException.class, () -> serverFacade.listGames(INVALID_AUTH_TOKEN));
     }
 
     @Test
-    public void testJoinGame_Success() throws ServiceException {
+    public void testJoinGameSuccess() throws ServiceException {
         UserData newUser = new UserData(VALID_USERNAME, VALID_PASSWORD, VALID_EMAIL);
         AuthData authData = serverFacade.register(newUser);
 
@@ -134,7 +134,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testJoinGame_Failure() {
+    public void testJoinGameFailure() {
         JoinGameRequest joinRequest = new JoinGameRequest("WHITE", 9999);
         assertThrows(ServiceException.class, () -> serverFacade.joinGame(joinRequest, INVALID_AUTH_TOKEN));
     }
