@@ -13,34 +13,31 @@ public class ChessBoardPrinter {
     }
 
     private static void renderBoard(ChessBoard board, boolean isWhitePerspective) {
-        // Set up row and column labels
-        String columns = "   a  b  c  d  e  f  g  h";
-        if (!isWhitePerspective) {
-            columns = "   h  g  f  e  d  c  b  a";
-        }
+        // Set up column labels
+        String columns = isWhitePerspective ? "   a  b  c  d  e  f  g  h" : "   h  g  f  e  d  c  b  a";
         System.out.println(columns);
 
-        // Iterate over rows and columns
-        for (int row = isWhitePerspective ? 8 : 1;
-             isWhitePerspective ? row >= 1 : row <= 8;
-             row += isWhitePerspective ? -1 : 1) {
-            System.out.print(row + " "); // Row label
+        // Iterate through rows based on perspective
+        int startRow = isWhitePerspective ? 8 : 1;
+        int endRow = isWhitePerspective ? 1 : 8;
+        int rowStep = isWhitePerspective ? -1 : 1;
 
-            for (int col = isWhitePerspective ? 1 : 8;
-                 isWhitePerspective ? col <= 8 : col >= 1;
-                 col += isWhitePerspective ? 1 : -1) {
+        for (int row = startRow; row != endRow + rowStep; row += rowStep) {
+            System.out.print(row + " "); // Print row label
 
-                ChessPosition pos = new ChessPosition(row, col);
+            // Iterate through columns based on perspective
+            for (int col = 1; col <= 8; col++) {
+                int displayCol = isWhitePerspective ? col : 9 - col; // Reverse column for Black perspective
+                ChessPosition pos = new ChessPosition(row, displayCol);
                 ChessPiece piece = board.getPiece(pos);
 
-                // Explicitly alternate colors
-                boolean isLightSquare = (row + col) % 2 == 0;
-
+                // Determine square color
+                boolean isLightSquare = (row + displayCol) % 2 == 1;
                 String squareColor = isLightSquare
                         ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY
                         : EscapeSequences.SET_BG_COLOR_DARK_GREY;
 
-                // Get piece Unicode or empty space
+                // Render piece or empty square
                 String pieceDisplay = piece != null
                         ? getUnicodeForPiece(piece)
                         : EscapeSequences.EMPTY;
@@ -48,10 +45,10 @@ public class ChessBoardPrinter {
                 System.out.print(squareColor + pieceDisplay + EscapeSequences.RESET_BG_COLOR);
             }
 
-            System.out.println(" " + row); // Row label on the right
+            System.out.println(" " + row); // Print row label again on the right
         }
 
-        System.out.println(columns); // Columns at the bottom
+        System.out.println(columns); // Print column labels again at the bottom
     }
 
 
