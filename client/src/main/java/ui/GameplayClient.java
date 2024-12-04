@@ -4,8 +4,9 @@ import chess.ChessMove;
 import exception.ServiceException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
-public class GameplayClient {
+public class GameplayClient implements ServerMessageObserver {
     private final WebSocketFacade webSocketFacade;
     private final int gameID;
     private final String authToken;
@@ -36,5 +37,9 @@ public class GameplayClient {
         var resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
         webSocketFacade.sendCommand(resignCommand);
     }
-    
+
+    @Override
+    public void notify(ServerMessage message) {
+
+    }
 }

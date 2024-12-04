@@ -29,7 +29,8 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
+    
+    //make a websocket handler called webSocketHandler
     private final UserService userService = new UserService(userDAO, authDAO);
     private final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
     private final GameService gameService = new GameService(authDAO, gameDAO);
@@ -40,6 +41,8 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::register);

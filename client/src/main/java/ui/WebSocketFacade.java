@@ -25,7 +25,13 @@ public class WebSocketFacade extends Endpoint {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
 
-            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleServerMessage);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
+                    observer.notify(notification);
+                }
+            });
         } catch (IOException | URISyntaxException | DeploymentException e) {
             throw new ServiceException(500, "Failed to connect WebSocket: " + e.getMessage());
         }
