@@ -1,21 +1,37 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
+import model.AuthData;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.ServerMessage;
+
 
 import java.io.IOException;
 
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connectionManager;
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
 
-    public WebSocketHandler() {
+
+    public WebSocketHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         this.connectionManager = new ConnectionManager();
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
     }
 
     @OnWebSocketConnect
@@ -43,9 +59,35 @@ public class WebSocketHandler {
 
     private void handleConnect(UserGameCommand command, Session session) throws IOException {
         int gameID = command.getGameID();
-        String userID = command.getAuthToken(); // Assume authToken as userID for now
-        connectionManager.addConnection(gameID, userID, session);
-        connectionManager.broadcast(gameID, userID, userID + " has joined the game.");
+        String authToken = command.getAuthToken();
+
+        try {
+            AuthData authData = authDAO.getAuth(authToken);
+            if (authData == null) {
+                throw new IOException("Unauthorized: Invalid auth token");
+            }
+            String username = authData.username();
+
+            connectionManager.addConnection(gameID, username, session);
+
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                throw new IOException("Game not found");
+            }
+
+            // Send LOAD_GAME to Root Client
+            LoadGameMessage loadGameMessage = new LoadGameMessage(
+                    ServerMessage.ServerMessageType.LOAD_GAME,
+                    gameData.game()
+            );
+            session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+
+            // Send Notification to Other Clients
+            connectionManager.broadcast(gameID, username, username + " has joined the game.");
+
+        } catch (DataAccessException e) {
+            throw new IOException("Error processing connect command: " + e.getMessage());
+        }
     }
 
     private void handleMakeMove(UserGameCommand command) throws IOException {

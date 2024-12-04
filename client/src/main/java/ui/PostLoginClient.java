@@ -76,10 +76,6 @@ public class PostLoginClient {
         return gamesList.get(gameNumber - 1);
     }
 
-    private void startPrintBoard(ChessGame game) {
-        ChessBoardPrinter.printBoard(game.getBoard());
-    }
-
     public void start() {
         PostLoginRepl postLoginRepl = new PostLoginRepl(this);
         boolean loggedOut = postLoginRepl.run();

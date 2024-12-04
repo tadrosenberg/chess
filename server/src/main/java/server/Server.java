@@ -31,7 +31,7 @@ public class Server {
         }
     }
 
-    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler(userDAO, authDAO, gameDAO);
     private final UserService userService = new UserService(userDAO, authDAO);
     private final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
     private final GameService gameService = new GameService(authDAO, gameDAO);
