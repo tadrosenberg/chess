@@ -50,22 +50,32 @@ public class PostLoginClient {
     }
 
     public void observe(int gameNumber) throws ServiceException {
-        if (getGameByNumber(gameNumber) != null) {
-            startPrintBoard(new ChessGame());
+        GameData gameData = getGameByNumber(gameNumber);
+        if (gameData != null) {
+            
+            //ServerMessageObserver observer = new GameplayObserver(); no idea what the frick an observer is
+            WebSocketFacade webSocketFacade = new WebSocketFacade(serverFacade.getServerUrl(), observer);
+
+            GameplayClient gameplayClient = new GameplayClient(webSocketFacade, gameData.gameID(), authToken);
+            new GameplayRepl(gameplayClient).run();
         } else {
-            throw new ServiceException(401, "game not found");
+            throw new ServiceException(401, "Game not found.");
         }
     }
 
     public void join(int gameNumber, String playerColor) throws ServiceException {
         GameData gameData = getGameByNumber(gameNumber);
         if (gameData != null && (Objects.equals(playerColor, "WHITE") || Objects.equals(playerColor, "BLACK"))) {
-
             JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameData.gameID());
             serverFacade.joinGame(joinGameRequest, authToken);
-            startPrintBoard(new ChessGame());
+
+            //ServerMessageObserver observer = new GameplayObserver(); no idea what the frick an observer is
+            WebSocketFacade webSocketFacade = new WebSocketFacade(serverFacade.getServerUrl(), observer);
+
+            GameplayClient gameplayClient = new GameplayClient(webSocketFacade, gameData.gameID(), authToken);
+            new GameplayRepl(gameplayClient).run();
         } else {
-            throw new ServiceException(401, "game not found");
+            throw new ServiceException(401, "Game not found.");
         }
     }
 

@@ -114,7 +114,6 @@ public class PostLoginRepl {
             String color = scanner.nextLine().trim().toUpperCase();
 
             postLoginClient.join(gameNumber, color);
-
             System.out.println("Joined game successfully!");
 
         } catch (ServiceException ex) {

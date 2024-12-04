@@ -24,6 +24,10 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
     public AuthData register(UserData user) throws ServiceException {
         return makeRequest("POST", "/user", user, AuthData.class);
     }

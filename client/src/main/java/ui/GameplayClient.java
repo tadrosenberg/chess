@@ -36,4 +36,5 @@ public class GameplayClient {
         var resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
         webSocketFacade.sendCommand(resignCommand);
     }
+    
 }
