@@ -2,7 +2,9 @@ package ui;
 
 import com.google.gson.Gson;
 import exception.ServiceException;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import websocket.commands.UserGameCommand;
 
@@ -37,10 +39,13 @@ public class WebSocketFacade extends Endpoint {
                             observer.notify(loadGameMessage);
                         }
                         case NOTIFICATION -> {
-                            ServerMessage notification = gson.fromJson(message, ServerMessage.class);
+                            NotificationMessage notification = gson.fromJson(message, NotificationMessage.class);
                             observer.notify(notification);
                         }
-                        case ERROR -> System.out.println("Error from server: " + message);
+                        case ERROR -> {
+                            ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+                            observer.notify(errorMessage);
+                        }
                     }
                 }
             });
@@ -76,12 +81,4 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    private void handleServerMessage(String message) {
-        try {
-            ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class); // Deserialize message
-            observer.notify(serverMessage); // Notify the observer
-        } catch (Exception e) {
-            System.err.println("Failed to process server message: " + e.getMessage());
-        }
-    }
 }

@@ -1,8 +1,12 @@
 package ui;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import exception.ServiceException;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -116,10 +120,15 @@ public class GameplayRepl implements ServerMessageObserver {
 
     @Override
     public void notify(ServerMessage message) {
-        switch (message.getServerMessageType()) {
-            case NOTIFICATION -> System.out.println("Notification: " + message.getMessage());
-            case LOAD_GAME -> System.out.println("Game Loaded!");
-            case ERROR -> System.err.println("Error: " + message.getMessage());
+        switch (message) {
+            case LoadGameMessage loadGameMessage -> {
+                ChessGame chessGame = loadGameMessage.getGame();
+                System.out.println("Game loaded! Drawing the board...");
+                ChessBoardPrinter.printBoard(chessGame.getBoard());
+            }
+            case NotificationMessage notification -> System.out.println(notification.getMessage());
+            case ErrorMessage notification -> System.out.println(notification.getErrorMessage());
+            case null, default -> System.out.println("Unknown message type received: " + message);
         }
     }
 }
