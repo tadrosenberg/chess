@@ -116,10 +116,10 @@ public class GameplayRepl implements ServerMessageObserver {
 
     @Override
     public void notify(ServerMessage message) {
-//        switch (serverMessage.getServerMessageType()) {
-//            case NOTIFICATION -> System.out.println("Notification: " + serverMessage.getMessage());
-//            case LOAD_GAME -> System.out.println("Game Loaded!");
-//            case ERROR -> System.err.println("Error: " + serverMessage.getMessage());
-//        }
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> System.out.println("Notification: " + message.getMessage());
+            case LOAD_GAME -> System.out.println("Game Loaded!");
+            case ERROR -> System.err.println("Error: " + message.getMessage());
+        }
     }
 }

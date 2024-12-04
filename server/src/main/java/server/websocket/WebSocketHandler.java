@@ -75,14 +75,12 @@ public class WebSocketHandler {
                 throw new IOException("Game not found");
             }
 
-            // Send LOAD_GAME to Root Client
             LoadGameMessage loadGameMessage = new LoadGameMessage(
                     ServerMessage.ServerMessageType.LOAD_GAME,
                     gameData.game()
             );
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
 
-            // Send Notification to Other Clients
             connectionManager.broadcast(gameID, username, username + " has joined the game.");
 
         } catch (DataAccessException e) {
