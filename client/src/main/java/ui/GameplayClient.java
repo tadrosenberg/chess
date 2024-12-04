@@ -6,7 +6,7 @@ import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
-public class GameplayClient implements ServerMessageObserver {
+public class GameplayClient {
     private final WebSocketFacade webSocketFacade;
     private final int gameID;
     private final String authToken;
@@ -36,10 +36,5 @@ public class GameplayClient implements ServerMessageObserver {
     public void resignGame() throws ServiceException {
         var resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
         webSocketFacade.sendCommand(resignCommand);
-    }
-
-    @Override
-    public void notify(ServerMessage message) {
-
     }
 }

@@ -3,10 +3,11 @@ package ui;
 import chess.ChessMove;
 import chess.ChessPosition;
 import exception.ServiceException;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
-public class GameplayRepl {
+public class GameplayRepl implements ServerMessageObserver {
     private final GameplayClient gameplayClient;
 
     public GameplayRepl(GameplayClient gameplayClient) {
@@ -109,5 +110,14 @@ public class GameplayRepl {
     private void redrawBoard() {
         // Redraw the board (fetch current game state and call ChessBoardPrinter)
         System.out.println("Redrawing the board...");
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+//        switch (serverMessage.getServerMessageType()) {
+//            case NOTIFICATION -> System.out.println("Notification: " + serverMessage.getMessage());
+//            case LOAD_GAME -> System.out.println("Game Loaded!");
+//            case ERROR -> System.err.println("Error: " + serverMessage.getMessage());
+//        }
     }
 }
