@@ -10,9 +10,11 @@ import java.util.Scanner;
 public class GameplayRepl implements ServerMessageObserver {
     private final GameplayClient gameplayClient;
 
-    public GameplayRepl(GameplayClient gameplayClient) {
-        this.gameplayClient = gameplayClient;
+    public GameplayRepl(String serverUrl, String authToken, int gameID) throws ServiceException {
+        WebSocketFacade webSocketFacade = new WebSocketFacade(serverUrl, this); // Pass REPL as observer
+        this.gameplayClient = new GameplayClient(webSocketFacade, gameID, authToken);
     }
+
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
