@@ -19,6 +19,7 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
               `gameJson` TEXT DEFAULT NULL,
+              `isFinished` BOOLEAN DEFAULT FALSE,
               PRIMARY KEY (`gameID`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
@@ -32,9 +33,9 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
     public GameData createGame(String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
         String gameJson = serializeChessGame(game);
-        String statement = "INSERT INTO game (gameName, gameJson) VALUES (?, ?)";
-        int id = executeUpdate(statement, gameName, gameJson);
-        return new GameData(id, null, null, gameName, game);
+        String statement = "INSERT INTO game (gameName, gameJson, isFinished) VALUES (?, ?, ?)";
+        int id = executeUpdate(statement, gameName, gameJson, false);
+        return new GameData(id, null, null, gameName, game, false);
     }
 
     private String serializeChessGame(ChessGame chessGame) throws DataAccessException {
@@ -53,7 +54,7 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
                 var json = rs.getString("gameJson");
                 var game = new Gson().fromJson(json, ChessGame.class);
                 return new GameData(rs.getInt("gameID"), rs.getString("whiteUsername"),
-                        rs.getString("blackUsername"), rs.getString("gameName"), game);
+                        rs.getString("blackUsername"), rs.getString("gameName"), game, rs.getBoolean("isFinished"));
             }
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage());
@@ -66,7 +67,7 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
     public void updateGame(GameData newGame) throws DataAccessException {
         var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, gameJson = ? WHERE gameID = ?";
         var json = new Gson().toJson(newGame.game());
-        executeUpdate(statement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), json, newGame.gameID());
+        executeUpdate(statement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), json, newGame.isFinished(), newGame.gameID());
     }
 
     @Override
@@ -83,7 +84,8 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
                         rs.getString("whiteUsername"),
                         rs.getString("blackUsername"),
                         rs.getString("gameName"),
-                        serGame
+                        serGame,
+                        rs.getBoolean("isFinished")
                 );
                 games.add(game);
             }

@@ -30,14 +30,12 @@ import java.io.IOException;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connectionManager;
-    private final UserDAO userDAO;
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
 
     public WebSocketHandler(UserDAO userDAO, AuthDAO authDAO, GameDAO gameDAO) {
         this.connectionManager = new ConnectionManager();
-        this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
@@ -92,11 +90,7 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Unauthorized: Invalid auth token"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Unauthorized: Invalid auth token");
                 return;
             }
             String username = authData.username();
@@ -105,11 +99,7 @@ public class WebSocketHandler {
 
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Game not found"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Game not found");
                 return;
             }
 
@@ -152,11 +142,7 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Unauthorized: Invalid auth token"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Unauthorized: Invalid auth token");
                 return;
             }
             String username = authData.username();
@@ -164,11 +150,7 @@ public class WebSocketHandler {
             // Fetch the game
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Unauthorized: Invalid auth token"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Game not found");
                 return;
             }
 
@@ -210,7 +192,7 @@ public class WebSocketHandler {
             }
 
             // Update the game in the database
-            gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
+            gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game, false));
 
             NotificationMessage notificationMessage = new NotificationMessage(
                     ServerMessage.ServerMessageType.NOTIFICATION,
@@ -268,11 +250,7 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Unauthorized: Invalid auth token"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Unauthorized: Invalid auth token");
                 return;
             }
             String username = authData.username();
@@ -284,11 +262,7 @@ public class WebSocketHandler {
             // Get the current game data
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Game not found"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Game not found");
                 return;
             }
 
@@ -299,7 +273,8 @@ public class WebSocketHandler {
                         null, // White player leaves
                         gameData.blackUsername(),
                         gameData.gameName(),
-                        gameData.game()
+                        gameData.game(),
+                        false
                 ));
             } else if (username.equals(gameData.blackUsername())) {
                 gameDAO.updateGame(new GameData(
@@ -307,7 +282,8 @@ public class WebSocketHandler {
                         gameData.whiteUsername(),
                         null, // Black player leaves
                         gameData.gameName(),
-                        gameData.game()
+                        gameData.game(),
+                        false
                 ));
             }
 
@@ -333,5 +309,13 @@ public class WebSocketHandler {
     private void handleResign(UserGameCommand command, Session session) throws IOException {
 
     }
-    
+
+    private void sendError(Session session, String errorMessageText) throws IOException {
+        ErrorMessage errorMessage = new ErrorMessage(
+                ServerMessage.ServerMessageType.ERROR,
+                errorMessageText
+        );
+        session.getRemote().sendString(new Gson().toJson(errorMessage));
+    }
+
 }
