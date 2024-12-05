@@ -154,8 +154,15 @@ public class WebSocketHandler {
                 return;
             }
 
+            // Check if the game is finished
+            if (gameData.isFinished()) {
+                sendError(session, "Game is already finished. No further moves allowed.");
+                return;
+            }
+
             ChessGame game = gameData.game();
 
+            
             // Check if it's the player's turn
             ChessGame.TeamColor currentTurn = game.getTeamTurn();
             if ((currentTurn == ChessGame.TeamColor.WHITE && !username.equals(gameData.whiteUsername())) ||
