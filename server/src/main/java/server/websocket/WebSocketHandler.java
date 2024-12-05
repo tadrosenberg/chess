@@ -4,6 +4,8 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
@@ -52,19 +54,33 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        var command = new Gson().fromJson(message, UserGameCommand.class);
-        switch (command.getCommandType()) {
-            case CONNECT -> handleConnect(command, session);
-            case MAKE_MOVE -> {
-                if (command instanceof MakeMoveCommand moveCommand) {
-                    handleMakeMove(moveCommand);
-                } else {
-                    throw new IOException("Invalid command format for MAKE_MOVE");
-                }
+        JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+
+        String commandType = jsonObject.get("commandType").getAsString();
+        System.out.println("Command type: " + commandType);
+
+        // Switch based on commandType
+        switch (commandType) {
+            case "CONNECT" -> {
+                UserGameCommand connectCommand = new Gson().fromJson(jsonObject, UserGameCommand.class);
+                handleConnect(connectCommand, session);
             }
-            case LEAVE -> handleLeave(command);
-            case RESIGN -> handleResign(command);
-            default -> System.out.println("Unknown command type: " + command.getCommandType());
+            case "MAKE_MOVE" -> {
+                MakeMoveCommand moveCommand = new Gson().fromJson(jsonObject, MakeMoveCommand.class);
+                handleMakeMove(moveCommand);
+            }
+            case "LEAVE" -> {
+                UserGameCommand leaveCommand = new Gson().fromJson(jsonObject, UserGameCommand.class);
+                handleLeave(leaveCommand);
+            }
+            case "RESIGN" -> {
+                UserGameCommand resignCommand = new Gson().fromJson(jsonObject, UserGameCommand.class);
+                handleResign(resignCommand);
+            }
+            default -> {
+                System.out.println("Unknown command type: " + commandType);
+                throw new IOException("Invalid command type: " + commandType);
+            }
         }
     }
 
@@ -113,9 +129,10 @@ public class WebSocketHandler {
     }
 
     private void handleMakeMove(MakeMoveCommand command) throws IOException {
+        System.out.println("in server handling move");
         int gameID = command.getGameID();
         String authToken = command.getAuthToken();
-        ChessMove move = command.getMove(); // Extract the move from the command
+        ChessMove move = command.getMove();
 
         try {
             AuthData authData = authDAO.getAuth(authToken);
@@ -136,6 +153,12 @@ public class WebSocketHandler {
 
             // Update the game in the database
             gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
+
+            NotificationMessage notificationMessage = new NotificationMessage(
+                    ServerMessage.ServerMessageType.NOTIFICATION,
+                    username + " has made the move: " + move
+            );
+            connectionManager.broadcast(gameID, username, notificationMessage);
 
             // Broadcast the updated game state to all clients
             LoadGameMessage loadGameMessage = new LoadGameMessage(

@@ -86,13 +86,16 @@ public class GameplayRepl implements ServerMessageObserver {
 
     private void handleMakeMove(Scanner scanner) {
         try {
-            System.out.print("Enter start position (e.g., 2,5): ");
-            String[] start = scanner.nextLine().split(",");
-            System.out.print("Enter end position (e.g., 4,5): ");
-            String[] end = scanner.nextLine().split(",");
+            System.out.print("Enter your move (e.g., e2 to e4): ");
+            String input = scanner.nextLine().trim().toLowerCase();
 
-            ChessPosition startPos = new ChessPosition(Integer.parseInt(start[0]), Integer.parseInt(start[1]));
-            ChessPosition endPos = new ChessPosition(Integer.parseInt(end[0]), Integer.parseInt(end[1]));
+            String[] positions = input.split(" to ");
+            if (positions.length != 2) {
+                throw new IllegalArgumentException("Invalid input format. Use 'e2 to e4'.");
+            }
+
+            ChessPosition startPos = parseChessPosition(positions[0]);
+            ChessPosition endPos = parseChessPosition(positions[1]);
             ChessMove move = new ChessMove(startPos, endPos, null); // Handle promotions later
 
             gameplayClient.makeMove(move);
@@ -100,7 +103,7 @@ public class GameplayRepl implements ServerMessageObserver {
         } catch (ServiceException ex) {
             System.out.println("Move failed: " + ex.getMessage());
         } catch (Exception ex) {
-            System.out.println("Invalid input. Please enter positions in the format row,col.");
+            System.out.println("Invalid input. Please enter positions in the format 'e2 to e4'.");
         }
     }
 
@@ -136,5 +139,13 @@ public class GameplayRepl implements ServerMessageObserver {
             case ErrorMessage notification -> System.out.println(notification.getErrorMessage());
             case null, default -> System.out.println("Unknown message type received: " + message);
         }
+    }
+
+    private ChessPosition parseChessPosition(String input) {
+        char colChar = input.charAt(0); // e.g., 'e'
+        int row = Character.getNumericValue(input.charAt(1)); // e.g., '2'
+
+        int col = colChar - 'a' + 1; // Convert 'a'-'h' to 1-8
+        return new ChessPosition(row, col);
     }
 }
