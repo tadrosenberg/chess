@@ -147,8 +147,22 @@ public class WebSocketHandler {
                 throw new IOException("Game not found");
             }
 
-            // Apply the move to the game
             ChessGame game = gameData.game();
+
+            // Check if it's the player's turn
+            ChessGame.TeamColor currentTurn = game.getTeamTurn();
+            if ((currentTurn == ChessGame.TeamColor.WHITE && !username.equals(gameData.whiteUsername())) ||
+                    (currentTurn == ChessGame.TeamColor.BLACK && !username.equals(gameData.blackUsername()))) {
+                throw new IOException("It is not your turn!");
+            }
+
+            // Check if the piece belongs to the player
+            ChessGame.TeamColor pieceColor = game.getBoard().getPiece(move.getStartPosition()).getTeamColor();
+            if ((currentTurn == ChessGame.TeamColor.WHITE && pieceColor != ChessGame.TeamColor.WHITE) ||
+                    (currentTurn == ChessGame.TeamColor.BLACK && pieceColor != ChessGame.TeamColor.BLACK)) {
+                throw new IOException("You can only move your own pieces!");
+            }
+
             game.makeMove(move);
 
             // Update the game in the database
