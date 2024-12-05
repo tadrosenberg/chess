@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import exception.ServiceException;
+import model.GameData;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -14,10 +15,12 @@ import java.util.Scanner;
 public class GameplayRepl implements ServerMessageObserver {
     private final GameplayClient gameplayClient;
     private final String userColor;
+    private ChessGame game;
 
-    public GameplayRepl(String serverUrl, String authToken, int gameID, String playerColor) throws ServiceException {
+    public GameplayRepl(String serverUrl, String authToken, int gameID, String playerColor, ChessGame game) throws ServiceException {
         WebSocketFacade webSocketFacade = new WebSocketFacade(serverUrl, this); // Pass REPL as observer
         this.gameplayClient = new GameplayClient(webSocketFacade, gameID, authToken);
+        this.game = game;
         this.userColor = playerColor;
     }
 
@@ -116,18 +119,19 @@ public class GameplayRepl implements ServerMessageObserver {
     }
 
     private void redrawBoard() {
-        // Redraw the board (fetch current game state and call ChessBoardPrinter)
         System.out.println("Redrawing the board...");
+        boolean isWhitePerspective = userColor == null || userColor.equals("WHITE");
+        ChessBoardPrinter.printBoard(game.getBoard(), isWhitePerspective);
     }
 
     @Override
     public void notify(ServerMessage message) {
         switch (message) {
             case LoadGameMessage loadGameMessage -> {
-                ChessGame chessGame = loadGameMessage.getGame();
+                game = loadGameMessage.getGame();
                 System.out.println("Game loaded! Drawing the board...");
                 boolean isWhitePerspective = userColor == null || userColor.equals("WHITE");
-                ChessBoardPrinter.printBoard(chessGame.getBoard(), isWhitePerspective);
+                ChessBoardPrinter.printBoard(game.getBoard(), isWhitePerspective);
             }
             case NotificationMessage notification -> System.out.println(notification.getMessage());
             case ErrorMessage notification -> System.out.println(notification.getErrorMessage());
