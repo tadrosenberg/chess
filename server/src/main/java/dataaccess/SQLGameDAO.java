@@ -48,7 +48,7 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson FROM game WHERE gameID=?";
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson, isFinished FROM game WHERE gameID=?";
         try (ResultSet rs = executeQuery(statement, gameID)) {
             if (rs.next()) {
                 var json = rs.getString("gameJson");
@@ -65,14 +65,14 @@ public class SQLGameDAO extends AbstractDAO implements GameDAO {
 
     @Override
     public void updateGame(GameData newGame) throws DataAccessException {
-        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, gameJson = ? WHERE gameID = ?";
+        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, gameJson = ?, isFinished = ? WHERE gameID = ?";
         var json = new Gson().toJson(newGame.game());
         executeUpdate(statement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), json, newGame.isFinished(), newGame.gameID());
     }
 
     @Override
     public GameData[] listGames() throws DataAccessException {
-        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson FROM game";
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, gameJson, isFinished FROM game";
         List<GameData> games = new ArrayList<>();
 
         try (ResultSet rs = executeQuery(statement)) { // Execute the query to get all games

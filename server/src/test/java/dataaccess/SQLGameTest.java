@@ -57,7 +57,7 @@ class SQLGameTest {
     void updateGameShouldModifyGameData() throws DataAccessException {
         GameData createdGame = gameDAO.createGame("testGame");
         ChessGame updatedChessGame = new ChessGame(); // Modify the ChessGame state as needed
-        createdGame = new GameData(createdGame.gameID(), "player1", "player2", "updatedGame", updatedChessGame);
+        createdGame = new GameData(createdGame.gameID(), "player1", "player2", "updatedGame", updatedChessGame, false);
 
         gameDAO.updateGame(createdGame);
 
@@ -107,7 +107,7 @@ class SQLGameTest {
     void updateGameNonExistentGameShouldNotModifyTable() throws DataAccessException {
         // Negative test: try to update a game that doesn’t exist
         ChessGame chessGame = new ChessGame(); // Example game state
-        GameData nonExistentGame = new GameData(-1, "player1", "player2", "nonExistentGame", chessGame);
+        GameData nonExistentGame = new GameData(-1, "player1", "player2", "nonExistentGame", chessGame, false);
 
         // Check the number of games before the update attempt
         int initialGameCount = gameDAO.listGames().length;

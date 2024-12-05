@@ -72,6 +72,8 @@ public abstract class AbstractDAO {
                 ps.setString(i + 1, (String) param);
             } else if (param instanceof Integer) {
                 ps.setInt(i + 1, (Integer) param);
+            } else if (param instanceof Boolean) {
+                ps.setBoolean(i + 1, (Boolean) param);
             } else if (param == null) {
                 ps.setNull(i + 1, NULL);
             }

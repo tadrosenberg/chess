@@ -25,7 +25,7 @@ public class GameService {
         if (gameName == null || gameName.isEmpty()) {
             throw new ServiceException(400, "Error: bad request");
         }
-        
+
         GameData newGame = gameDAO.createGame(gameName);
 
         return new CreateGameResult(newGame.gameID());
@@ -57,7 +57,7 @@ public class GameService {
         if (playerColor.equals("WHITE")) {
             if (game.whiteUsername() == null) {
                 // Create a new GameData record with the updated whiteUsername
-                GameData updatedGame = new GameData(game.gameID(), joiningUser, game.blackUsername(), game.gameName(), game.game());
+                GameData updatedGame = new GameData(game.gameID(), joiningUser, game.blackUsername(), game.gameName(), game.game(), false);
                 gameDAO.updateGame(updatedGame); // Replace the old game with the updated one
             } else {
                 throw new ServiceException(403, "Error: already taken");
@@ -65,7 +65,7 @@ public class GameService {
         } else if (playerColor.equals("BLACK")) {
             if (game.blackUsername() == null) {
                 // Create a new GameData record with the updated blackUsername
-                GameData updatedGame = new GameData(game.gameID(), game.whiteUsername(), joiningUser, game.gameName(), game.game());
+                GameData updatedGame = new GameData(game.gameID(), game.whiteUsername(), joiningUser, game.gameName(), game.game(), false);
                 gameDAO.updateGame(updatedGame); // Replace the old game with the updated one
             } else {
                 throw new ServiceException(403, "Error: already taken");
