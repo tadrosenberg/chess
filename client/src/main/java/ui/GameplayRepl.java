@@ -39,7 +39,10 @@ public class GameplayRepl implements ServerMessageObserver {
 
                 switch (input) {
                     case "help" -> displayHelp();
-                    case "leave" -> handleLeave();
+                    case "leave" -> {
+                        gameplayClient.leaveGame();
+                        running = false;
+                    }
                     case "resign" -> handleResign();
                     case "make move" -> handleMakeMove(scanner);
                     case "highlight moves" -> handleHighlightMoves(scanner);
@@ -62,23 +65,6 @@ public class GameplayRepl implements ServerMessageObserver {
                 - make move: Make a move in the game.
                 - highlight moves: Highlight legal moves for a specific piece.
                 """);
-    }
-
-    private void handleLeave() {
-        try {
-            System.out.println("[Gameplay] Are you sure you want to leave the game? Type 'yes' to confirm:");
-            Scanner scanner = new Scanner(System.in);
-            String confirmation = scanner.nextLine().trim().toLowerCase();
-
-            if (confirmation.equals("yes")) {
-                gameplayClient.leaveGame();
-                System.out.println("[Gameplay] You have left the game.");
-            } else {
-                System.out.println("[Gameplay] Leave cancelled.");
-            }
-        } catch (ServiceException ex) {
-            System.out.println("[Gameplay] Failed to leave the game: " + ex.getMessage());
-        }
     }
 
     private void handleResign() {
