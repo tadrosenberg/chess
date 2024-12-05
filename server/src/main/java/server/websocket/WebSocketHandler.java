@@ -75,7 +75,7 @@ public class WebSocketHandler {
             if (gameData == null) {
                 throw new IOException("Game not found");
             }
-            
+
             String playerColor;
             if (username.equals(gameData.whiteUsername())) {
                 playerColor = "WHITE";
@@ -106,8 +106,59 @@ public class WebSocketHandler {
     }
 
     private void handleLeave(UserGameCommand command) throws IOException {
+        int gameID = command.getGameID();
+        String authToken = command.getAuthToken();
 
+        try {
+            AuthData authData = authDAO.getAuth(authToken);
+            if (authData == null) {
+                throw new IOException("Unauthorized: Invalid auth token");
+            }
+            String username = authData.username();
+
+
+            // Remove user from the connection manager
+            connectionManager.removeConnection(gameID, username);
+
+            // Get the current game data
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                throw new IOException("Game not found");
+            }
+
+            // Update the game state if the user was a player
+            if (username.equals(gameData.whiteUsername())) {
+                gameDAO.updateGame(new GameData(
+                        gameID,
+                        null, // White player leaves
+                        gameData.blackUsername(),
+                        gameData.gameName(),
+                        gameData.game()
+                ));
+            } else if (username.equals(gameData.blackUsername())) {
+                gameDAO.updateGame(new GameData(
+                        gameID,
+                        gameData.whiteUsername(),
+                        null, // Black player leaves
+                        gameData.gameName(),
+                        gameData.game()
+                ));
+            }
+
+            // Notify other clients
+            NotificationMessage notificationMessage = new NotificationMessage(
+                    ServerMessage.ServerMessageType.NOTIFICATION,
+                    username + " has left the game"
+            );
+            connectionManager.broadcast(gameID, username, notificationMessage);
+
+            // Clean up any closed sessions
+            connectionManager.cleanUpClosedSessions();
+        } catch (DataAccessException ex) {
+            throw new IOException("Error processing leave command: " + ex.getMessage());
+        }
     }
+
 
     private void handleResign(UserGameCommand command) throws IOException {
 

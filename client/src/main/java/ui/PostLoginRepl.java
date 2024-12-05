@@ -115,7 +115,7 @@ public class PostLoginRepl {
             System.out.println("Join failed: " + ex.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please enter a valid game number.");
-            scanner.nextLine(); // Clear invalid input
+            scanner.nextLine();
         }
     }
 }
