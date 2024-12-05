@@ -307,8 +307,73 @@ public class WebSocketHandler {
 
 
     private void handleResign(UserGameCommand command, Session session) throws IOException {
+        int gameID = command.getGameID();
+        String authToken = command.getAuthToken();
 
+        try {
+            // Validate the auth token
+            AuthData authData = authDAO.getAuth(authToken);
+            if (authData == null) {
+                sendError(session, "Unauthorized: Invalid auth token");
+                return;
+            }
+            String username = authData.username();
+
+            // Get the current game data
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                sendError(session, "Game not found");
+                return;
+            }
+
+            ChessGame game = gameData.game();
+
+            // Determine if the user is a player in the game
+            if (username.equals(gameData.whiteUsername())) {
+                // White player resigns
+                NotificationMessage resignNotification = new NotificationMessage(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        "White player " + username + " has resigned. Black wins!"
+                );
+                connectionManager.broadcast(gameID, null, resignNotification);
+
+                // Update game as finished
+                gameDAO.updateGame(new GameData(
+                        gameID,
+                        gameData.whiteUsername(),
+                        gameData.blackUsername(),
+                        gameData.gameName(),
+                        game,
+                        true // Mark game as finished
+                ));
+            } else if (username.equals(gameData.blackUsername())) {
+                // Black player resigns
+                NotificationMessage resignNotification = new NotificationMessage(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        "Black player " + username + " has resigned. White wins!"
+                );
+                connectionManager.broadcast(gameID, null, resignNotification);
+
+                // Update game as finished
+                gameDAO.updateGame(new GameData(
+                        gameID,
+                        gameData.whiteUsername(),
+                        gameData.blackUsername(),
+                        gameData.gameName(),
+                        game,
+                        true // Mark game as finished
+                ));
+            } else {
+                // User is not a player in the game
+                sendError(session, "Only players can resign from the game");
+                return;
+            }
+
+        } catch (DataAccessException ex) {
+            sendError(session, "Failed to process resign: " + ex.getMessage());
+        }
     }
+
 
     private void sendError(Session session, String errorMessageText) throws IOException {
         ErrorMessage errorMessage = new ErrorMessage(
