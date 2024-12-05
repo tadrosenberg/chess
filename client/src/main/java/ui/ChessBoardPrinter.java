@@ -7,12 +7,12 @@ import chess.ChessPosition;
 
 public class ChessBoardPrinter {
 
-    public static void printBoard(ChessBoard board) {
-        System.out.println("Black's Perspective:");
-        renderBoard(board, false);
-        System.out.println("\nWhite's Perspective:");
-        renderBoard(board, true);
+    public static void printBoard(ChessBoard board, boolean isWhitePerspective) {
+        String perspective = isWhitePerspective ? "White's Perspective:" : "Black's Perspective:";
+        System.out.println(perspective);
+        renderBoard(board, isWhitePerspective);
     }
+
 
     private static void renderBoard(ChessBoard board, boolean isWhitePerspective) {
         String columns = isWhitePerspective ? "   a  b  c  d  e  f  g  h" : "   h  g  f  e  d  c  b  a";

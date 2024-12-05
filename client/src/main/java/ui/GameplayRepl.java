@@ -13,10 +13,12 @@ import java.util.Scanner;
 
 public class GameplayRepl implements ServerMessageObserver {
     private final GameplayClient gameplayClient;
+    private final String userColor;
 
-    public GameplayRepl(String serverUrl, String authToken, int gameID) throws ServiceException {
+    public GameplayRepl(String serverUrl, String authToken, int gameID, String playerColor) throws ServiceException {
         WebSocketFacade webSocketFacade = new WebSocketFacade(serverUrl, this); // Pass REPL as observer
         this.gameplayClient = new GameplayClient(webSocketFacade, gameID, authToken);
+        this.userColor = playerColor;
     }
 
 
@@ -124,7 +126,8 @@ public class GameplayRepl implements ServerMessageObserver {
             case LoadGameMessage loadGameMessage -> {
                 ChessGame chessGame = loadGameMessage.getGame();
                 System.out.println("Game loaded! Drawing the board...");
-                ChessBoardPrinter.printBoard(chessGame.getBoard());
+                boolean isWhitePerspective = userColor == null || userColor.equals("WHITE");
+                ChessBoardPrinter.printBoard(chessGame.getBoard(), isWhitePerspective);
             }
             case NotificationMessage notification -> System.out.println(notification.getMessage());
             case ErrorMessage notification -> System.out.println(notification.getErrorMessage());

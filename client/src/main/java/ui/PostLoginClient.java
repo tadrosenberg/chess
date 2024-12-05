@@ -52,7 +52,7 @@ public class PostLoginClient {
     public void observe(int gameNumber) throws ServiceException {
         GameData gameData = getGameByNumber(gameNumber);
         if (gameData != null) {
-            new GameplayRepl(serverFacade.getServerUrl(), authToken, gameData.gameID()).run();
+            new GameplayRepl(serverFacade.getServerUrl(), authToken, gameData.gameID(), null).run();
         } else {
             throw new ServiceException(401, "Game not found.");
         }
@@ -63,7 +63,8 @@ public class PostLoginClient {
         if (gameData != null && (Objects.equals(playerColor, "WHITE") || Objects.equals(playerColor, "BLACK"))) {
             JoinGameRequest joinGameRequest = new JoinGameRequest(playerColor, gameData.gameID());
             serverFacade.joinGame(joinGameRequest, authToken);
-            new GameplayRepl(serverFacade.getServerUrl(), authToken, gameData.gameID()).run();
+
+            new GameplayRepl(serverFacade.getServerUrl(), authToken, gameData.gameID(), playerColor).run();
         } else {
             throw new ServiceException(401, "Game not found.");
         }
