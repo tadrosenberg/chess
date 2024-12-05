@@ -19,6 +19,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -129,7 +130,6 @@ public class WebSocketHandler {
     }
 
     private void handleMakeMove(MakeMoveCommand command) throws IOException {
-        System.out.println("in server handling move");
         int gameID = command.getGameID();
         String authToken = command.getAuthToken();
         ChessMove move = command.getMove();
@@ -137,14 +137,16 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                throw new IOException("Unauthorized: Invalid auth token");
+                broadcastErrorMessage(gameID, "Unauthorized: Invalid auth token");
+                return;
             }
             String username = authData.username();
 
             // Fetch the game
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                throw new IOException("Game not found");
+                broadcastErrorMessage(gameID, "Game not found");
+                return;
             }
 
             ChessGame game = gameData.game();
@@ -153,17 +155,24 @@ public class WebSocketHandler {
             ChessGame.TeamColor currentTurn = game.getTeamTurn();
             if ((currentTurn == ChessGame.TeamColor.WHITE && !username.equals(gameData.whiteUsername())) ||
                     (currentTurn == ChessGame.TeamColor.BLACK && !username.equals(gameData.blackUsername()))) {
-                throw new IOException("It is not your turn!");
+                broadcastErrorMessage(gameID, "It is not your turn!");
+                return;
             }
 
             // Check if the piece belongs to the player
             ChessGame.TeamColor pieceColor = game.getBoard().getPiece(move.getStartPosition()).getTeamColor();
             if ((currentTurn == ChessGame.TeamColor.WHITE && pieceColor != ChessGame.TeamColor.WHITE) ||
                     (currentTurn == ChessGame.TeamColor.BLACK && pieceColor != ChessGame.TeamColor.BLACK)) {
-                throw new IOException("You can only move your own pieces!");
+                broadcastErrorMessage(gameID, "You can only move your own pieces!");
+                return;
             }
 
-            game.makeMove(move);
+            try {
+                game.makeMove(move);
+            } catch (InvalidMoveException ex) {
+                broadcastErrorMessage(gameID, "Invalid move: " + ex.getMessage());
+                return;
+            }
 
             // Update the game in the database
             gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
@@ -226,7 +235,8 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                throw new IOException("Unauthorized: Invalid auth token");
+                broadcastErrorMessage(gameID, "Unauthorized: Invalid auth token");
+                return;
             }
             String username = authData.username();
 
@@ -237,7 +247,8 @@ public class WebSocketHandler {
             // Get the current game data
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                throw new IOException("Game not found");
+                broadcastErrorMessage(gameID, "Game not found");
+                return;
             }
 
             // Update the game state if the user was a player
@@ -276,5 +287,13 @@ public class WebSocketHandler {
 
     private void handleResign(UserGameCommand command) throws IOException {
 
+    }
+
+    private void broadcastErrorMessage(int gameID, String errorMessage) throws IOException {
+        ErrorMessage error = new ErrorMessage(
+                ServerMessage.ServerMessageType.ERROR,
+                errorMessage
+        );
+        connectionManager.broadcast(gameID, null, error);
     }
 }
