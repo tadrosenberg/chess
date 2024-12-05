@@ -28,14 +28,8 @@ public class PostLoginRepl {
                     return true;
                 }
                 case "create" -> handleCreate(scanner);
-                case "join" -> {
-                    running = false;
-                    handleJoin(scanner);
-                }
-                case "observe" -> {
-                    running = false;
-                    handleObserve(scanner);
-                }
+                case "join" -> handleJoin(scanner);
+                case "observe" -> handleObserve(scanner);
                 case "list" -> handleList(scanner);
                 default -> System.out.println("Unknown command. Type 'help' for a list of valid commands.");
             }
@@ -89,19 +83,20 @@ public class PostLoginRepl {
     }
 
     private void handleObserve(Scanner scanner) {
-        System.out.print("Enter game # to observe: ");
-        int gameNumber;
         try {
-            gameNumber = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character after the integer
+            System.out.print("Enter game # to observe: ");
+            int gameNumber = scanner.nextInt();
+            scanner.nextLine();
 
-            //use id
             postLoginClient.observe(gameNumber);
+            System.out.println("Now observing game #" + gameNumber);
 
         } catch (ServiceException ex) {
             System.out.println("Observe failed: " + ex.getMessage());
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a valid game number.");
+            scanner.nextLine();
         }
-
     }
 
     private void handleJoin(Scanner scanner) {
@@ -120,7 +115,7 @@ public class PostLoginRepl {
             System.out.println("Join failed: " + ex.getMessage());
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please enter a valid game number.");
-            scanner.nextLine();
+            scanner.nextLine(); // Clear invalid input
         }
     }
 }
