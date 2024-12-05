@@ -14,6 +14,7 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 
@@ -74,6 +75,15 @@ public class WebSocketHandler {
             if (gameData == null) {
                 throw new IOException("Game not found");
             }
+            
+            String playerColor;
+            if (username.equals(gameData.whiteUsername())) {
+                playerColor = "WHITE";
+            } else if (username.equals(gameData.blackUsername())) {
+                playerColor = "BLACK";
+            } else {
+                playerColor = "OBSERVER";
+            }
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(
                     ServerMessage.ServerMessageType.LOAD_GAME,
@@ -81,7 +91,11 @@ public class WebSocketHandler {
             );
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
 
-            connectionManager.broadcast(gameID, username, username + " has joined the game.");
+            NotificationMessage notificationMessage = new NotificationMessage(
+                    ServerMessage.ServerMessageType.NOTIFICATION,
+                    username + " has joined the game as " + playerColor
+            );
+            connectionManager.broadcast(gameID, username, notificationMessage);
 
         } catch (DataAccessException e) {
             throw new IOException("Error processing connect command: " + e.getMessage());
@@ -89,19 +103,13 @@ public class WebSocketHandler {
     }
 
     private void handleMakeMove(UserGameCommand command) throws IOException {
-        int gameID = command.getGameID();
-        connectionManager.broadcast(gameID, "", "Move made: ");
     }
 
     private void handleLeave(UserGameCommand command) throws IOException {
-        int gameID = command.getGameID();
-        String userID = command.getAuthToken();
-        connectionManager.removeConnection(gameID, userID);
-        connectionManager.broadcast(gameID, userID, userID + " has left the game.");
+
     }
 
     private void handleResign(UserGameCommand command) throws IOException {
-        int gameID = command.getGameID();
-        connectionManager.broadcast(gameID, "", "Game resigned by: " + command.getAuthToken());
+
     }
 }
