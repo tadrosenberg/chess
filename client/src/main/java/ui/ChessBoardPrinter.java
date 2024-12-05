@@ -1,20 +1,33 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ChessBoardPrinter {
 
-    public static void printBoard(ChessBoard board, boolean isWhitePerspective) {
+    public static void printBoardWithHighlights(ChessGame game, ChessPosition startPosition, boolean isWhitePerspective) {
+        Collection<ChessMove> validMoves = game.validMoves(startPosition);
+        Set<ChessPosition> highlightedPositions = validMoves.stream()
+                .map(ChessMove::getEndPosition)
+                .collect(Collectors.toSet());
+        printBoard(game.getBoard(), isWhitePerspective, highlightedPositions);
+    }
+
+    public static void printBoard(ChessBoard board, boolean isWhitePerspective, Set<ChessPosition> positions) {
         String perspective = isWhitePerspective ? "White's Perspective:" : "Black's Perspective:";
         System.out.println(perspective);
-        renderBoard(board, isWhitePerspective);
+        renderBoard(board, isWhitePerspective, positions);
+    }
+
+    public static void printBoard(ChessBoard board, boolean isWhitePerspective) {
+        printBoard(board, isWhitePerspective, Set.of());
     }
 
 
-    private static void renderBoard(ChessBoard board, boolean isWhitePerspective) {
+    private static void renderBoard(ChessBoard board, boolean isWhitePerspective, Set<ChessPosition> highlightedPositions) {
         String columns = isWhitePerspective ? "   a  b  c  d  e  f  g  h" : "   h  g  f  e  d  c  b  a";
         System.out.println(columns);
 
@@ -31,7 +44,11 @@ public class ChessBoardPrinter {
                 ChessPiece piece = board.getPiece(pos);
 
                 boolean isLightSquare = (row + displayCol) % 2 == 0;
-                String squareColor = isLightSquare
+                boolean isHighlighted = highlightedPositions.contains(pos);
+
+                String squareColor = isHighlighted
+                        ? EscapeSequences.SET_BG_COLOR_HIGHLIGHT
+                        : isLightSquare
                         ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY
                         : EscapeSequences.SET_BG_COLOR_DARK_GREY;
 

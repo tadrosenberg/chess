@@ -111,9 +111,8 @@ public class GameplayRepl implements ServerMessageObserver {
             System.out.print("Enter piece position (e.g., 2,5): ");
             String[] position = scanner.nextLine().split(",");
             ChessPosition pos = new ChessPosition(Integer.parseInt(position[0]), Integer.parseInt(position[1]));
-
-            // Call a method in GameplayClient to highlight moves (add functionality as needed)
-            System.out.println("Highlighted legal moves for piece at " + pos);
+            boolean isWhitePerspective = userColor == null || userColor.equals("WHITE");
+            ChessBoardPrinter.printBoardWithHighlights(game, pos, isWhitePerspective);
         } catch (Exception ex) {
             System.out.println("Invalid input. Please enter positions in the format row,col.");
         }
