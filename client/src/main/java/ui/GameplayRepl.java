@@ -99,7 +99,6 @@ public class GameplayRepl implements ServerMessageObserver {
             ChessMove move = new ChessMove(startPos, endPos, null); // Handle promotions later
 
             gameplayClient.makeMove(move);
-            System.out.println("Move made!");
         } catch (ServiceException ex) {
             System.out.println("Move failed: " + ex.getMessage());
         } catch (Exception ex) {
@@ -145,7 +144,7 @@ public class GameplayRepl implements ServerMessageObserver {
         char colChar = input.charAt(0); // e.g., 'e'
         int row = Character.getNumericValue(input.charAt(1)); // e.g., '2'
 
-        int col = colChar - 'a' + 1; // Convert 'a'-'h' to 1-8
+        int col = 9 - (colChar - 'a' + 1); // Convert 'a'-'h' to 1-8
         return new ChessPosition(row, col);
     }
 }
