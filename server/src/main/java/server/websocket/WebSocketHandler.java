@@ -162,7 +162,7 @@ public class WebSocketHandler {
 
             ChessGame game = gameData.game();
 
-            
+
             // Check if it's the player's turn
             ChessGame.TeamColor currentTurn = game.getTeamTurn();
             if ((currentTurn == ChessGame.TeamColor.WHITE && !username.equals(gameData.whiteUsername())) ||
@@ -334,6 +334,10 @@ public class WebSocketHandler {
             }
 
             ChessGame game = gameData.game();
+            if (gameData.isFinished()) {
+                sendError(session, "Game already over");
+                return;
+            }
 
             // Determine if the user is a player in the game
             if (username.equals(gameData.whiteUsername())) {
