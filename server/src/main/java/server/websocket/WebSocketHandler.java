@@ -68,15 +68,15 @@ public class WebSocketHandler {
             }
             case "MAKE_MOVE" -> {
                 MakeMoveCommand moveCommand = new Gson().fromJson(jsonObject, MakeMoveCommand.class);
-                handleMakeMove(moveCommand);
+                handleMakeMove(moveCommand, session);
             }
             case "LEAVE" -> {
                 UserGameCommand leaveCommand = new Gson().fromJson(jsonObject, UserGameCommand.class);
-                handleLeave(leaveCommand);
+                handleLeave(leaveCommand, session);
             }
             case "RESIGN" -> {
                 UserGameCommand resignCommand = new Gson().fromJson(jsonObject, UserGameCommand.class);
-                handleResign(resignCommand);
+                handleResign(resignCommand, session);
             }
             default -> {
                 System.out.println("Unknown command type: " + commandType);
@@ -92,7 +92,12 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                throw new IOException("Unauthorized: Invalid auth token");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Unauthorized: Invalid auth token"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return;
             }
             String username = authData.username();
 
@@ -100,7 +105,12 @@ public class WebSocketHandler {
 
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                throw new IOException("Game not found");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Game not found"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                return;
             }
 
             String playerColor;
@@ -125,11 +135,16 @@ public class WebSocketHandler {
             connectionManager.broadcast(gameID, username, notificationMessage);
 
         } catch (DataAccessException e) {
-            throw new IOException("Error processing connect command: " + e.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage(
+                    ServerMessage.ServerMessageType.ERROR,
+                    "Couldn't access data"
+            );
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
+            return;
         }
     }
 
-    private void handleMakeMove(MakeMoveCommand command) throws IOException {
+    private void handleMakeMove(MakeMoveCommand command, Session session) throws IOException {
         int gameID = command.getGameID();
         String authToken = command.getAuthToken();
         ChessMove move = command.getMove();
@@ -137,7 +152,11 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                broadcastErrorMessage(gameID, "Unauthorized: Invalid auth token");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Unauthorized: Invalid auth token"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
             String username = authData.username();
@@ -145,7 +164,11 @@ public class WebSocketHandler {
             // Fetch the game
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                broadcastErrorMessage(gameID, "Game not found");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Unauthorized: Invalid auth token"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
 
@@ -155,7 +178,11 @@ public class WebSocketHandler {
             ChessGame.TeamColor currentTurn = game.getTeamTurn();
             if ((currentTurn == ChessGame.TeamColor.WHITE && !username.equals(gameData.whiteUsername())) ||
                     (currentTurn == ChessGame.TeamColor.BLACK && !username.equals(gameData.blackUsername()))) {
-                broadcastErrorMessage(gameID, "It is not your turn!");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Not your turn!"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
 
@@ -163,14 +190,22 @@ public class WebSocketHandler {
             ChessGame.TeamColor pieceColor = game.getBoard().getPiece(move.getStartPosition()).getTeamColor();
             if ((currentTurn == ChessGame.TeamColor.WHITE && pieceColor != ChessGame.TeamColor.WHITE) ||
                     (currentTurn == ChessGame.TeamColor.BLACK && pieceColor != ChessGame.TeamColor.BLACK)) {
-                broadcastErrorMessage(gameID, "You can only move your own pieces!");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Only move your own piece!"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
 
             try {
                 game.makeMove(move);
             } catch (InvalidMoveException ex) {
-                broadcastErrorMessage(gameID, "Invalid move: " + ex.getMessage());
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Invalid move"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
 
@@ -222,20 +257,22 @@ public class WebSocketHandler {
 
         } catch (DataAccessException ex) {
             throw new IOException("Failed to process move: " + ex.getMessage());
-        } catch (InvalidMoveException ex) {
-            throw new IOException("Invalid move: " + ex.getMessage());
         }
     }
 
 
-    private void handleLeave(UserGameCommand command) throws IOException {
+    private void handleLeave(UserGameCommand command, Session session) throws IOException {
         int gameID = command.getGameID();
         String authToken = command.getAuthToken();
 
         try {
             AuthData authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                broadcastErrorMessage(gameID, "Unauthorized: Invalid auth token");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Unauthorized: Invalid auth token"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
             String username = authData.username();
@@ -247,7 +284,11 @@ public class WebSocketHandler {
             // Get the current game data
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
-                broadcastErrorMessage(gameID, "Game not found");
+                ErrorMessage errorMessage = new ErrorMessage(
+                        ServerMessage.ServerMessageType.ERROR,
+                        "Game not found"
+                );
+                session.getRemote().sendString(new Gson().toJson(errorMessage));
                 return;
             }
 
@@ -280,20 +321,17 @@ public class WebSocketHandler {
             // Clean up any closed sessions
             connectionManager.cleanUpClosedSessions();
         } catch (DataAccessException ex) {
-            throw new IOException("Error processing leave command: " + ex.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage(
+                    ServerMessage.ServerMessageType.ERROR,
+                    "Couldn't process leave command"
+            );
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
         }
     }
 
 
-    private void handleResign(UserGameCommand command) throws IOException {
+    private void handleResign(UserGameCommand command, Session session) throws IOException {
 
     }
-
-    private void broadcastErrorMessage(int gameID, String errorMessage) throws IOException {
-        ErrorMessage error = new ErrorMessage(
-                ServerMessage.ServerMessageType.ERROR,
-                errorMessage
-        );
-        connectionManager.broadcast(gameID, null, error);
-    }
+    
 }
