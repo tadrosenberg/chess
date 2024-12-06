@@ -97,20 +97,20 @@ public class GameplayRepl implements ServerMessageObserver {
             ChessPosition startPos = parseChessPosition(positions[0]);
             ChessPosition endPos = parseChessPosition(positions[1]);
             ChessMove move = new ChessMove(startPos, endPos, null); // Handle promotions later
-
+            
             gameplayClient.makeMove(move);
         } catch (ServiceException ex) {
             System.out.println("Move failed: " + ex.getMessage());
         } catch (Exception ex) {
-            System.out.println("Invalid input. Please enter positions in the format 'e2 to e4'.");
+            System.out.println("Invalid move.");
         }
     }
 
     private void handleHighlightMoves(Scanner scanner) {
         try {
-            System.out.print("Enter piece position (e.g., 2,5): ");
-            String[] position = scanner.nextLine().split(",");
-            ChessPosition pos = new ChessPosition(Integer.parseInt(position[0]), Integer.parseInt(position[1]));
+            System.out.print("Enter a piece (e.g. e2): ");
+            String input = scanner.nextLine().trim().toLowerCase();
+            ChessPosition pos = parseChessPosition(input);
             boolean isWhitePerspective = userColor == null || userColor.equals("WHITE");
             ChessBoardPrinter.printBoardWithHighlights(game, pos, isWhitePerspective);
         } catch (Exception ex) {

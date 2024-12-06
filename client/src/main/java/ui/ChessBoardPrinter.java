@@ -13,6 +13,7 @@ public class ChessBoardPrinter {
         Set<ChessPosition> highlightedPositions = validMoves.stream()
                 .map(ChessMove::getEndPosition)
                 .collect(Collectors.toSet());
+        highlightedPositions.add(startPosition);
         printBoard(game.getBoard(), isWhitePerspective, highlightedPositions);
     }
 
@@ -38,12 +39,12 @@ public class ChessBoardPrinter {
         for (int row = startRow; row != endRow + rowStep; row += rowStep) {
             System.out.print(row + " ");
 
-            for (int col = 1; col <= 8; col++) {
+            for (int col = 8; col > 0; col--) {
                 int displayCol = isWhitePerspective ? 9 - col : col;
                 ChessPosition pos = new ChessPosition(row, displayCol);
                 ChessPiece piece = board.getPiece(pos);
 
-                boolean isLightSquare = (row + displayCol) % 2 == 0;
+                boolean isLightSquare = (row + displayCol) % 2 == 1;
                 boolean isHighlighted = highlightedPositions.contains(pos);
 
                 String squareColor = isHighlighted
