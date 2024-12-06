@@ -147,58 +147,39 @@ public class WebSocketHandler {
             }
             String username = authData.username();
 
-            // Fetch the game
             GameData gameData = gameDAO.getGame(gameID);
             if (gameData == null) {
                 sendError(session, "Game not found");
                 return;
             }
 
-            // Check if the game is finished
             if (gameData.isFinished()) {
                 sendError(session, "Game is already finished. No further moves allowed.");
                 return;
             }
-
             ChessGame game = gameData.game();
 
-
-            // Check if it's the player's turn
             ChessGame.TeamColor currentTurn = game.getTeamTurn();
             if ((currentTurn == ChessGame.TeamColor.WHITE && !username.equals(gameData.whiteUsername())) ||
                     (currentTurn == ChessGame.TeamColor.BLACK && !username.equals(gameData.blackUsername()))) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Not your turn!"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Not your turn");
                 return;
             }
 
-            // Check if the piece belongs to the player
             ChessGame.TeamColor pieceColor = game.getBoard().getPiece(move.getStartPosition()).getTeamColor();
             if ((currentTurn == ChessGame.TeamColor.WHITE && pieceColor != ChessGame.TeamColor.WHITE) ||
                     (currentTurn == ChessGame.TeamColor.BLACK && pieceColor != ChessGame.TeamColor.BLACK)) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Only move your own piece!"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Only move your own piece!");
                 return;
             }
 
             try {
                 game.makeMove(move);
             } catch (InvalidMoveException ex) {
-                ErrorMessage errorMessage = new ErrorMessage(
-                        ServerMessage.ServerMessageType.ERROR,
-                        "Invalid move"
-                );
-                session.getRemote().sendString(new Gson().toJson(errorMessage));
+                sendError(session, "Not a legal move");
                 return;
             }
 
-            // Update the game in the database
             gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game, false));
 
             NotificationMessage notificationMessage = new NotificationMessage(
@@ -207,14 +188,12 @@ public class WebSocketHandler {
             );
             connectionManager.broadcast(gameID, username, notificationMessage);
 
-            // Broadcast the updated game state to all clients
             LoadGameMessage loadGameMessage = new LoadGameMessage(
                     ServerMessage.ServerMessageType.LOAD_GAME,
                     game
             );
             connectionManager.broadcast(gameID, null, loadGameMessage);
 
-            // Check for special conditions
             ChessGame.TeamColor opponentColor = game.getTeamTurn();
             if (game.isInCheckmate(opponentColor)) {
                 String inCheckmatePlayer = null;
@@ -246,7 +225,6 @@ public class WebSocketHandler {
             throw new IOException("Failed to process move: " + ex.getMessage());
         }
     }
-
 
     private void handleLeave(UserGameCommand command, Session session) throws IOException {
         int gameID = command.getGameID();
