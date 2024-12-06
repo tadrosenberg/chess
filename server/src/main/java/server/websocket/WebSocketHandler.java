@@ -216,20 +216,6 @@ public class WebSocketHandler {
 
             // Check for special conditions
             ChessGame.TeamColor opponentColor = game.getTeamTurn();
-            if (game.isInCheck(opponentColor)) {
-                String inCheckPlayer = null;
-                if (opponentColor == ChessGame.TeamColor.WHITE) {
-                    inCheckPlayer = gameData.whiteUsername();
-                } else if (opponentColor == ChessGame.TeamColor.BLACK) {
-                    inCheckPlayer = gameData.blackUsername();
-                }
-                NotificationMessage checkNotification = new NotificationMessage(
-                        ServerMessage.ServerMessageType.NOTIFICATION,
-                        inCheckPlayer + " is in check!"
-                );
-                connectionManager.broadcast(gameID, null, checkNotification);
-            }
-
             if (game.isInCheckmate(opponentColor)) {
                 String inCheckmatePlayer = null;
                 if (opponentColor == ChessGame.TeamColor.WHITE) {
@@ -239,7 +225,19 @@ public class WebSocketHandler {
                 }
                 NotificationMessage checkNotification = new NotificationMessage(
                         ServerMessage.ServerMessageType.NOTIFICATION,
-                        inCheckmatePlayer + " is in check!"
+                        inCheckmatePlayer + " is in checkmate!"
+                );
+                connectionManager.broadcast(gameID, null, checkNotification);
+            } else if (game.isInCheck(opponentColor)) {
+                String inCheckPlayer = null;
+                if (opponentColor == ChessGame.TeamColor.WHITE) {
+                    inCheckPlayer = gameData.whiteUsername();
+                } else if (opponentColor == ChessGame.TeamColor.BLACK) {
+                    inCheckPlayer = gameData.blackUsername();
+                }
+                NotificationMessage checkNotification = new NotificationMessage(
+                        ServerMessage.ServerMessageType.NOTIFICATION,
+                        inCheckPlayer + " is in check!"
                 );
                 connectionManager.broadcast(gameID, null, checkNotification);
             }
